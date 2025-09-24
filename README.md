@@ -1,16 +1,14 @@
-# flutterbooth
+# Flutterbooth
+A Photobooth desktop application made with Flutter and using libgphoto2 
 
-A new Flutter project.
+## Why
+The reasons that led me to create this application were:
+- The desire to discover Flutter through a relevant project
+- The fact that I couldn't find an existing open-source application that met my needs
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Goal
+The goal is to create a final application that is:
+- Easy to install
+- Usable without a touchscreen, with navigation controlled by three buttons (previous, next, confirm)
+- Customizable
+- And performs well
