@@ -11,16 +11,16 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/app_config.dart';
 import '../services/config_service.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsScreen extends StatefulWidget {
   final AppConfig initialConfig;
 
-  const SettingsPage({super.key, required this.initialConfig});
+  const SettingsScreen({super.key, required this.initialConfig});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsScreenState extends State<SettingsScreen> {
   late AppConfig _config;
   final _formKey = GlobalKey<FormState>();
   int _currentIndex = 0;

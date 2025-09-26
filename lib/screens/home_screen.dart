@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterbooth/models/app_config.dart';
 import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
-import 'package:flutterbooth/screens/settings_page.dart';
+import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
+import 'package:flutterbooth/screens/result_screen.dart';
+import 'package:flutterbooth/screens/settings_screen.dart';
 import 'package:flutterbooth/services/access_checker.dart';
 import 'package:flutterbooth/services/config_service.dart';
 import 'package:flutterbooth/widgets/rotationg_menu.dart';
@@ -39,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => SettingsPage(initialConfig: _config),
+        builder: (_) => SettingsScreen(initialConfig: _config),
       ),
     );
 
@@ -58,7 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Focus(
-      key: ValueKey(_config.shortcutSettingsLogicalKeyId),
       autofocus: true,
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent) {
@@ -141,36 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Bouton Photo
                   IconButton(
                     onPressed: () {
-                      // TODO: action photo
-                      showDialog<void>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Basic dialog title'),
-                            content: const Text(
-                              'A dialog is a type of modal window that\n'
-                              'appears in front of app content to\n'
-                              'provide critical information, or prompt\n'
-                              'for a decision to be made.',
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
-                                child: const Text('Disable'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              TextButton(
-                                style: TextButton.styleFrom(textStyle: Theme.of(context).textTheme.labelLarge),
-                                child: const Text('Enable'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CountdownAndCaptureScreen(appConfig: _config),
+                        ),
                       );
                     },
                     icon: _config.photoIcon(
@@ -183,7 +161,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Bouton Galerie
                   IconButton(
                     onPressed: () {
-                      // TODO: action galerie
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ResultScreen(appConfig: _config, image: Image.file(File(_config.mainWallpaperPath))),
+                        ),
+                      );
                     },
                     icon: _config.galleryIcon(
                       width: 48,

@@ -13,31 +13,31 @@ extension AppConfigWidgets on AppConfig {
   }
 
   Widget countdown3({double? width, double? height, BoxFit fit = BoxFit.contain}) {
-    return _buildImage(countdown3Path, width: width, height: height, fit: fit);
+    return _buildImage(countdown3Path ?? mainWallpaperPath, width: width, height: height, fit: fit);
   }
 
   Widget countdown2({double? width, double? height, BoxFit fit = BoxFit.contain}) {
-    return _buildImage(countdown2Path, width: width, height: height, fit: fit);
+    return _buildImage(countdown2Path ?? mainWallpaperPath, width: width, height: height, fit: fit);
   }
 
   Widget countdown1({double? width, double? height, BoxFit fit = BoxFit.contain}) {
-    return _buildImage(countdown1Path, width: width, height: height, fit: fit);
+    return _buildImage(countdown1Path ?? mainWallpaperPath, width: width, height: height, fit: fit);
   }
 
   Widget capture({double? width, double? height, BoxFit fit = BoxFit.contain}) {
-    return _buildImage(capturePath, width: width, height: height, fit: fit);
+    return _buildImage(capturePath ?? mainWallpaperPath, width: width, height: height, fit: fit);
   }
 
   Widget result({double? width, double? height, BoxFit fit = BoxFit.contain}) {
-    return _buildImage(resultPath, width: width, height: height, fit: fit);
+    return _buildImage(resultPath ?? mainWallpaperPath, width: width, height: height, fit: fit);
   }
 
   Widget gallery({double? width, double? height, BoxFit fit = BoxFit.contain}) {
-    return _buildImage(galleryPath, width: width, height: height, fit: fit);
+    return _buildImage(galleryPath ?? mainWallpaperPath, width: width, height: height, fit: fit);
   }
 
   Widget collage({double? width, double? height, BoxFit fit = BoxFit.contain}) {
-    return _buildImage(collagePath, width: width, height: height, fit: fit);
+    return _buildImage(collagePath ?? mainWallpaperPath, width: width, height: height, fit: fit);
   }
 
   Widget photoIcon({double? width, double? height, ColorFilter? colorFilter}) {
