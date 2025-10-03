@@ -27,15 +27,14 @@ class _CountdownAndCaptureScreenState extends State<CountdownAndCaptureScreen> {
 
   void _startCountdown() {
     Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _counter--;
+      });
       if (_counter == 0) {
         if (widget.onCapture != null) {
           widget.onCapture!();
         }
         timer.cancel();
-      } else {
-        setState(() {
-          _counter--;
-        });
       }
     });
   }

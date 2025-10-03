@@ -9,6 +9,7 @@ import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
 import 'package:flutterbooth/screens/settings_screen.dart';
 import 'package:flutterbooth/services/access_checker.dart';
+import 'package:flutterbooth/services/capture_service.dart';
 import 'package:flutterbooth/services/config_service.dart';
 import 'package:flutterbooth/widgets/rotationg_menu.dart';
 import 'package:window_manager/window_manager.dart';
@@ -144,10 +145,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Bouton Photo
                   IconButton(
                     onPressed: () {
+                      final captureService = CaptureService("/home/ggatouillat/Development/flutterbooth/temp");
+                      // On pousse l'écran de décompte
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => CountdownAndCaptureScreen(appConfig: _config),
+                          builder: (_) => CountdownAndCaptureScreen(
+                            appConfig: _config,
+                            onCapture: () async {
+                              final path = await captureService.capture();
+
+                              if (path != null && File(path).existsSync()) {
+                                final imageWidget = Image.file(File(path));
+
+                                if (context.mounted) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ResultScreen(
+                                        appConfig: _config,
+                                        image: imageWidget,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                if (context.mounted) {
+                                  // Gestion d'erreur si la capture échoue
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("Erreur lors de la capture de la photo")),
+                                  );
+                                }
+
+                                // Retour à l’écran précédent
+                                Navigator.pop(context);
+                              }
+                            },
+                          ),
                         ),
                       );
                     },
@@ -161,12 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Bouton Galerie
                   IconButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ResultScreen(appConfig: _config, image: Image.file(File(_config.mainWallpaperPath))),
-                        ),
-                      );
+                      // TODO: action galerie
                     },
                     icon: _config.galleryIcon(
                       width: 48,

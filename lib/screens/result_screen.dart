@@ -85,7 +85,7 @@ class _ResultScreenState extends State<ResultScreen> {
               child: AspectRatio(
                 aspectRatio: 4 / 3,
                 child: Container(
-                  margin: const EdgeInsets.only(bottom: 50),
+                  margin: const EdgeInsets.only(top: 50, bottom: 130),
                   child: _image,
                 ),
               ),
@@ -101,6 +101,22 @@ class _ResultScreenState extends State<ResultScreen> {
                   key: menuKey,
                   displayedChildren: 3,
                   children: [
+                    // Back
+                    IconButton(
+                      onPressed: () {
+                        if (mounted) {
+                          Navigator.pop(context, true);
+                        }
+                      },
+                      icon: _config.backIcon(
+                        width: 48,
+                        height: 48,
+                        colorFilter: ColorFilter.mode(
+                          _config.mainColor,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
                     // Print
                     IconButton(
                       onPressed: () {
@@ -118,23 +134,17 @@ class _ResultScreenState extends State<ResultScreen> {
                     // Remove
                     IconButton(
                       onPressed: () {
-                        // TODO: action remove
+                        if (_image.image is FileImage) {
+                          final file = (_image.image as FileImage).file;
+                          if (file.existsSync()) {
+                            file.deleteSync();
+                            if (mounted) {
+                              Navigator.pop(context, true);
+                            }
+                          }
+                        }
                       },
                       icon: _config.removeIcon(
-                        width: 48,
-                        height: 48,
-                        colorFilter: ColorFilter.mode(
-                          _config.mainColor,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                    // Back
-                    IconButton(
-                      onPressed: () {
-                        // TODO: action back
-                      },
-                      icon: _config.backIcon(
                         width: 48,
                         height: 48,
                         colorFilter: ColorFilter.mode(
