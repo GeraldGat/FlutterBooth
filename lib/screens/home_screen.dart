@@ -5,6 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:flutterbooth/models/app_config.dart';
 import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
+import 'package:flutterbooth/models/four_collage.dart';
+import 'package:flutterbooth/models/two_collage.dart';
+import 'package:flutterbooth/models/two_plus_one_collage.dart';
+import 'package:flutterbooth/screens/collage_screen.dart';
 import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
 import 'package:flutterbooth/screens/gallery_screen.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
@@ -213,9 +217,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           ColorFilter.mode(_config.mainColor, BlendMode.srcIn),
                     ),
                   ),
+                  // Bouton Collage
                   IconButton(
                     onPressed: () {
-                      // TODO: action collage
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CollageScreen(
+                            appConfig: _config,
+                            collages: [
+                              TwoCollage(),
+                              TwoPlusOneCollage(),
+                              FourCollage(),
+                            ],
+                          ),
+                        ),
+                      );
                     },
                     icon: _config.collageIcon(
                       width: 48,
