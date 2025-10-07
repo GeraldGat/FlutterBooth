@@ -119,7 +119,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               );
               if (picked != null) {
-                final hex = picked.toARGB32().toRadixString(16).substring(2).toUpperCase();
+                final hex = picked.toARGB32().toRadixString(16).toUpperCase();
                 controller.text = hex;
                 onChanged(hex);
                 setState(() {});

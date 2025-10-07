@@ -6,6 +6,7 @@ import 'package:flutterbooth/models/app_config.dart';
 import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
 import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
+import 'package:flutterbooth/screens/gallery_screen.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
 import 'package:flutterbooth/screens/settings_screen.dart';
 import 'package:flutterbooth/services/access_checker.dart';
@@ -175,10 +176,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(content: Text("Erreur lors de la capture de la photo")),
                                   );
-                                }
 
-                                // Retour à l’écran précédent
-                                Navigator.pop(context);
+                                  // Retour à l’écran précédent
+                                  Navigator.pop(context);
+                                }
                               }
                             },
                           ),
@@ -195,7 +196,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Bouton Galerie
                   IconButton(
                     onPressed: () {
-                      // TODO: action galerie
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => GalleryScreen(
+                            imageFolder: "/home/ggatouillat/Development/flutterbooth/temp",
+                            appConfig: _config,
+                          ),
+                        ),
+                      );
                     },
                     icon: _config.galleryIcon(
                       width: 48,
