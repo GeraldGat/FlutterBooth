@@ -47,7 +47,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// Sauvegarde avec hash du mot de passe
   Future<void> _saveConfig() async {
     final toSave = _config.copyWith(
-      adminPassword: _config.adminPassword!.isEmpty
+      adminPassword: _config.adminPassword?.isEmpty ?? true
           ? ""
           : sha256.convert(utf8.encode(_config.adminPassword ?? "")).toString(),
     );

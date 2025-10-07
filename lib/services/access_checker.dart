@@ -5,7 +5,7 @@ import 'package:flutterbooth/models/app_config.dart';
 
 class AccessChecker {
   static Future<bool> checkAdminAccess(BuildContext context, AppConfig config) async {
-    if (config.adminPassword!.isEmpty) return true;
+    if (config.adminPassword?.isEmpty ?? true) return true;
 
     final controller = TextEditingController();
     final ok = await showDialog<bool>(
