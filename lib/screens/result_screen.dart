@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutterbooth/models/app_config.dart';
 import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
+import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:flutterbooth/widgets/rotationg_menu.dart';
-import 'package:window_manager/window_manager.dart';
 
 class ResultScreen extends StatefulWidget {
   final Image image;
@@ -20,59 +19,36 @@ class _ResultScreenState extends State<ResultScreen> {
   final GlobalKey<RotatingMenuState> menuKey = GlobalKey<RotatingMenuState>();
   late AppConfig _config;
   late Image _image;
-  late bool _isFullscreen;
 
   @override
   void initState() {
     super.initState();
     _config = widget.appConfig;
     _image = widget.image;
-    _initFullscreen();
   }
 
-  Future<void> _initFullscreen() async {
-    _isFullscreen = await WindowManager.instance.isFullScreen();
-    setState(() {});
+  void _handlePrev() {
+    menuKey.currentState?.movePrevious();
+  }
+
+  void _handleNext() {
+    menuKey.currentState?.moveNext();
+  }
+
+  void _handleEnter() {
+    try {
+      (menuKey.currentState?.selected as dynamic).onPressed?.call();
+    } catch (e) {
+      // Ignore si pas de bouton sélectionné
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Focus(autofocus: true,
-      onKeyEvent: (node, event) {
-        if (event is KeyDownEvent) {
-          if (event.logicalKey.keyId == _config.shortcutEnterLogicalKeyId) {
-              try {
-                (menuKey.currentState?.selected as dynamic).onPressed?.call();
-              } catch (e) {
-                return KeyEventResult.ignored;
-              }
-              return KeyEventResult.handled;
-          }
-
-          if (event.logicalKey.keyId == _config.shortcutPrevLogicalKeyId) {
-            menuKey.currentState?.movePrevious();
-            return KeyEventResult.handled;
-          }
-
-          if (event.logicalKey.keyId == _config.shortcutNextLogicalKeyId) {
-            menuKey.currentState?.moveNext();
-            return KeyEventResult.handled;
-          }
-
-          if (event.logicalKey == LogicalKeyboardKey.f11) {
-            _isFullscreen = !_isFullscreen;
-            WindowManager.instance.setFullScreen(_isFullscreen);
-            return KeyEventResult.handled;
-          }
-
-          if (event.logicalKey == LogicalKeyboardKey.escape && _isFullscreen) {
-            _isFullscreen = !_isFullscreen;
-            WindowManager.instance.setFullScreen(_isFullscreen);
-            return KeyEventResult.handled;
-          }
-        }
-        return KeyEventResult.ignored;
-      },
+    return FbKeyboardActions(
+      onPrevious: _handlePrev,
+      onNext: _handleNext,
+      onConfirm: _handleEnter,
       child: Scaffold(
         body: Stack(
           fit: StackFit.expand,

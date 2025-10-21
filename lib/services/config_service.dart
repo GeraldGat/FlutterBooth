@@ -34,6 +34,14 @@ class ConfigService {
     return null;
   }
 
+  Future<AppConfig> getConfig() async {
+    if (currentConfig != null) {
+      return currentConfig!;
+    }
+    currentConfig = await loadConfig() ?? AppConfig();
+    return currentConfig!;
+  }
+
   Future<void> saveConfig(AppConfig config) async {
     currentConfig = config;
     final file = await _getConfigFile();

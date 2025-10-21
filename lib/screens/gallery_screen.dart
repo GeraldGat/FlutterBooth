@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:io';
 
 import 'package:flutterbooth/models/app_config.dart';
 import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
+import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:mime/mime.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -20,23 +20,25 @@ class GalleryScreen extends StatefulWidget {
 
 class _GalleryScreenState extends State<GalleryScreen> {
   List<String> allImages = [];
+
   int currentPage = 0;
-  int selectedIndex = 0;
-  final FocusNode _focusNode = FocusNode();
+  int selectedIndex = 1;
+  List<(bool, Function)> get actionList {
+    return [
+      (currentPage > 0, _previousPage),
+      (true, _openSelectedImage),
+      (currentImages.length > 1, _openSelectedImage),
+      (currentImages.length > 2, _openSelectedImage),
+      (currentImages.length > 3, _openSelectedImage),
+      ((currentPage + 1) * 4 < allImages.length, _nextPage),
+      (true, _closeScreen),
+    ];
+  }
   
   @override
   void initState() {
     super.initState();
     _loadImages();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
   }
 
   void _loadImages() {
@@ -58,44 +60,52 @@ class _GalleryScreenState extends State<GalleryScreen> {
     return allImages.sublist(start, end);
   }
 
-  bool get canGoPrevious => currentPage > 0;
-  bool get canGoNext => (currentPage + 1) * 4 < allImages.length;
+  void _previousPage() {
+    setState(() {
+      currentPage--;
+    });
+  }
 
-  void _goToPrevious() {
-    if (canGoPrevious) {
-      setState(() {
-        currentPage--;
-      });
+  void _nextPage() {
+    setState(() {
+      currentPage++;
+    });
+  }
+
+  void _closeScreen() {
+    if (mounted) {
+      Navigator.of(context).pop();
     }
   }
 
-  void _goToNext() {
-    if (canGoNext) {
-      setState(() {
-        currentPage++;
-      });
-    }
+  void _openSelectedImage() {
+    _openImage(selectedIndex);
   }
 
-  void _handleKeyPress(KeyEvent event) {
-    if (event is KeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-        setState(() => selectedIndex = (selectedIndex - 1 + 7) % 7);
-      } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-        setState(() => selectedIndex = (selectedIndex + 1 + 7) % 7);
-      } else if (event.logicalKey == LogicalKeyboardKey.enter) {
-        if (selectedIndex == 4) {
-          _goToPrevious();
-        } else if (selectedIndex == 5) {
-          _goToNext();
-        } else if (selectedIndex == 6) {
-          if (mounted) {
-            Navigator.of(context).pop();
-          }
-        } else {
-          _openImage(selectedIndex);
-        }
+  int _getNextAvailableIndex(int step) {
+    int nextIndex = selectedIndex;
+
+    for (int i = 0; i < actionList.length; i++) {
+      nextIndex = (nextIndex + step + 7) % 7;
+      if (actionList[nextIndex].$1 == true) {
+        return nextIndex;
       }
+    }
+
+    return selectedIndex;
+  }
+
+  void _handlePrev() {
+    setState(() => selectedIndex = _getNextAvailableIndex(-1));
+  }
+
+  void _handleNext() {
+    setState(() => selectedIndex = _getNextAvailableIndex(1));
+  }
+
+  void _handleEnter() {
+    if (actionList[selectedIndex].$1 == true) {
+      actionList[selectedIndex].$2.call();
     }
   }
 
@@ -133,9 +143,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
       imageHeight = imageWidth * 2 / 3;
     }
 
-    return KeyboardListener(
-      focusNode: _focusNode,
-      onKeyEvent: _handleKeyPress,
+    return FbKeyboardActions(
+      onPrevious: _handlePrev,
+      onNext: _handleNext,
+      onConfirm: _handleEnter,
       child: Scaffold(
         body: Stack(
           fit: StackFit.expand,
@@ -145,6 +156,25 @@ class _GalleryScreenState extends State<GalleryScreen> {
               height: double.infinity,
               fit: BoxFit.cover,
             ),
+
+            // Bouton précédent (gauche)
+            if (actionList[0].$1 == true)
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: IconButton(
+                    onPressed: _previousPage,
+                    icon: widget.appConfig.prevIcon(
+                      width: 96,
+                      height: 96,
+                      colorFilter:
+                          ColorFilter.mode(selectedIndex == 0 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
+                    ),
+                  ),
+                ),
+              ),
             
             // Images centrales
             Center(
@@ -161,9 +191,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                   itemCount: currentImages.length,
                   itemBuilder: (context, index) {
-                    final isSelected = selectedIndex == index;
+                    final isSelected = selectedIndex == index + 1;
                     return GestureDetector(
-                      onTap: () => setState(() => selectedIndex = index),
+                      onTap: () => setState(() => selectedIndex = index + 1),
                       onDoubleTap: () => _openImage(index),
                       child: Container(
                         decoration: BoxDecoration(
@@ -189,38 +219,15 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ),
             ),
 
-            // Bouton précédent (gauche)
-            if (canGoPrevious)
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: IconButton(
-                    onPressed: () {
-                      _goToPrevious();
-                    },
-                    icon: widget.appConfig.prevIcon(
-                      width: 96,
-                      height: 96,
-                      colorFilter:
-                          ColorFilter.mode(selectedIndex == 4 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
-                    ),
-                  ),
-                ),
-              ),
-
             // Bouton suivant (droite)
-            if (canGoNext)
+            if (actionList[5].$1 == true)
               Positioned(
                 right: 0,
                 top: 0,
                 bottom: 0,
                 child: Center(
                   child: IconButton(
-                    onPressed: () {
-                      _goToNext();
-                    },
+                    onPressed: _nextPage,
                     icon: widget.appConfig.nextIcon(
                       width: 96,
                       height: 96,
@@ -236,11 +243,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
               top: 0,
               right: 0,
               child: IconButton(
-                onPressed: () {
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
+                onPressed: _closeScreen,
                 icon: widget.appConfig.closeIcon(
                   width: 96,
                   height: 96,

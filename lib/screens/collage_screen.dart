@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:io';
 
 import 'package:flutterbooth/models/app_config.dart';
@@ -8,6 +7,7 @@ import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
 import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
+import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:flutterbooth/services/capture_service.dart';
 
 class CollageScreen extends StatefulWidget {
@@ -22,39 +22,71 @@ class CollageScreen extends StatefulWidget {
 
 class _CollageScreenState extends State<CollageScreen> {
   int currentPage = 0;
-  int selectedIndex = 0;
-  final FocusNode _focusNode = FocusNode();
-  
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
+  int selectedIndex = 1;
+  List<(bool, Function)> get actionList {
+    return [
+      (currentPage > 0, _previousPage),
+      (true, _makeSelectedCollage),
+      (currentCollages.length > 1, _makeSelectedCollage),
+      (currentCollages.length > 2, _makeSelectedCollage),
+      (currentCollages.length > 3, _makeSelectedCollage),
+      ((currentPage + 1) * 4 < widget.collages.length, _nextPage),
+      (true, _closeScreen),
+    ];
+  }
+
+  List<Collage> get currentCollages {
+    final start = currentPage * 4;
+    final end = (start + 4).clamp(0, widget.collages.length);
+    return widget.collages.sublist(start, end);
+  }
+
+  void _previousPage() {
+    setState(() {
+      currentPage--;
     });
   }
 
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
+  void _nextPage() {
+    setState(() {
+      currentPage++;
+    });
   }
 
-  bool get canGoPrevious => currentPage > 0;
-  bool get canGoNext => (currentPage + 1) * 4 < widget.collages.length;
-
-  void _goToPrevious() {
-    if (canGoPrevious) {
-      setState(() {
-        currentPage--;
-      });
+  void _closeScreen() {
+    if (mounted) {
+      Navigator.of(context).pop();
     }
   }
 
-  void _goToNext() {
-    if (canGoNext) {
-      setState(() {
-        currentPage++;
-      });
+  void _makeSelectedCollage() {
+    _makeCollage(currentCollages[selectedIndex]);
+  }
+
+  int _getNextAvailableIndex(int step) {
+    int nextIndex = selectedIndex;
+
+    for (int i = 0; i < actionList.length; i++) {
+      nextIndex = (nextIndex + step + 7) % 7;
+      if (actionList[nextIndex].$1 == true) {
+        return nextIndex;
+      }
+    }
+
+    return selectedIndex;
+  }
+
+  void _handlePrev() {
+    setState(() => selectedIndex = _getNextAvailableIndex(-1));
+  }
+
+  void _handleNext() {
+    setState(() => selectedIndex = _getNextAvailableIndex(1));
+  }
+
+  void _handleEnter() {
+    if (actionList[selectedIndex].$1 == true) {
+      actionList[selectedIndex].$2.call();
     }
   }
 
@@ -101,28 +133,6 @@ class _CollageScreenState extends State<CollageScreen> {
     }
   }
 
-  void _handleKeyPress(KeyEvent event) {
-    if (event is KeyDownEvent) {
-      if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-        setState(() => selectedIndex = (selectedIndex - 1 + 7) % 7);
-      } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-        setState(() => selectedIndex = (selectedIndex + 1 + 7) % 7);
-      } else if (event.logicalKey == LogicalKeyboardKey.enter) {
-        if (selectedIndex == 4) {
-          _goToPrevious();
-        } else if (selectedIndex == 5) {
-          _goToNext();
-        } else if (selectedIndex == 6) {
-          if (mounted) {
-            Navigator.of(context).pop();
-          }
-        } else {
-          _makeCollage(widget.collages[currentPage * 4 + selectedIndex]);
-        }
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     const spacing = 10.0;
@@ -137,18 +147,38 @@ class _CollageScreenState extends State<CollageScreen> {
       imageHeight = imageWidth * 2 / 3;
     }
 
-    return KeyboardListener(
-      focusNode: _focusNode,
-      onKeyEvent: _handleKeyPress,
+    return FbKeyboardActions(
+      onPrevious: _handlePrev,
+      onNext: _handleNext,
+      onConfirm: _handleEnter,
       child: Scaffold(
         body: Stack(
           fit: StackFit.expand,
           children: [
-            widget.appConfig.gallery(
+            widget.appConfig.collage(
               width: double.infinity,
               height: double.infinity,
               fit: BoxFit.cover,
             ),
+
+            // Bouton précédent (gauche)
+            if (actionList[0].$1 == true)
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: Center(
+                  child: IconButton(
+                    onPressed: _previousPage,
+                    icon: widget.appConfig.prevIcon(
+                      width: 96,
+                      height: 96,
+                      colorFilter:
+                          ColorFilter.mode(selectedIndex == 4 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
+                    ),
+                  ),
+                ),
+              ),
             
             // Images centrales
             Center(
@@ -163,11 +193,11 @@ class _CollageScreenState extends State<CollageScreen> {
                     mainAxisSpacing: spacing,
                     childAspectRatio: 3/2,
                   ),
-                  itemCount: widget.collages.length,
+                  itemCount: currentCollages.length,
                   itemBuilder: (context, index) {
-                    final isSelected = selectedIndex == index;
+                    final isSelected = selectedIndex == index + 1;
                     return GestureDetector(
-                      onTap: () => setState(() => selectedIndex = index),
+                      onTap: () => setState(() => selectedIndex = index + 1),
                       child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -181,7 +211,7 @@ class _CollageScreenState extends State<CollageScreen> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.file(
-                            File(widget.collages[index].thumbnailAsset),
+                            File(currentCollages[index].thumbnailAsset),
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -192,38 +222,15 @@ class _CollageScreenState extends State<CollageScreen> {
               ),
             ),
 
-            // Bouton précédent (gauche)
-            if (canGoPrevious)
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: IconButton(
-                    onPressed: () {
-                      _goToPrevious();
-                    },
-                    icon: widget.appConfig.prevIcon(
-                      width: 96,
-                      height: 96,
-                      colorFilter:
-                          ColorFilter.mode(selectedIndex == 4 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
-                    ),
-                  ),
-                ),
-              ),
-
             // Bouton suivant (droite)
-            if (canGoNext)
+            if (actionList[5].$1 == true)
               Positioned(
                 right: 0,
                 top: 0,
                 bottom: 0,
                 child: Center(
                   child: IconButton(
-                    onPressed: () {
-                      _goToNext();
-                    },
+                    onPressed: _nextPage,
                     icon: widget.appConfig.nextIcon(
                       width: 96,
                       height: 96,
@@ -239,11 +246,7 @@ class _CollageScreenState extends State<CollageScreen> {
               top: 0,
               right: 0,
               child: IconButton(
-                onPressed: () {
-                  if (mounted) {
-                    Navigator.of(context).pop();
-                  }
-                },
+                onPressed: _closeScreen,
                 icon: widget.appConfig.closeIcon(
                   width: 96,
                   height: 96,

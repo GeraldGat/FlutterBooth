@@ -15,13 +15,11 @@ class CountdownAndCaptureScreen extends StatefulWidget {
 }
 
 class _CountdownAndCaptureScreenState extends State<CountdownAndCaptureScreen> {
-  late AppConfig _config;
   int _counter = 3;
 
   @override
   void initState() {
     super.initState();
-    _config = widget.appConfig;
     _startCountdown();
   }
 
@@ -46,20 +44,20 @@ class _CountdownAndCaptureScreenState extends State<CountdownAndCaptureScreen> {
 
     switch (_counter) {
       case 3:
-        background = _config.countdown3();
+        background = widget.appConfig.countdown3();
         text = "3";
         break;
       case 2:
-        background = _config.countdown2();
+        background = widget.appConfig.countdown2();
         text = "2";
         break;
       case 1:
-        background = _config.countdown1();
+        background = widget.appConfig.countdown1();
         text = "1";
         break;
       default:
-        background = _config.capture();
-        text = _config.captureText;
+        background = widget.appConfig.capture();
+        text = widget.appConfig.captureText;
     }
 
     return Scaffold(
@@ -71,10 +69,10 @@ class _CountdownAndCaptureScreenState extends State<CountdownAndCaptureScreen> {
             child: Text(
               text,
               style: TextStyle(
-                fontFamily: _config.fontFamilyName,
+                fontFamily: widget.appConfig.fontFamilyName,
                 fontSize: 100,
                 fontWeight: FontWeight.bold,
-                color: _config.textColor,
+                color: widget.appConfig.textColor,
               ),
               textAlign: TextAlign.center,
             ),

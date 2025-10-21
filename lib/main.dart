@@ -1,31 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:flutterbooth/models/extensions/app_config_colors.dart';
+import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/screens/home_screen.dart';
-import 'services/config_service.dart';
-import 'models/app_config.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterbooth/widgets/fb_keyboard_listener.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  final loadedConfig = await ConfigService().loadConfig();
-  final config = loadedConfig ?? AppConfig();
-
-  runApp(App(config: config));
+  runApp(const ProviderScope(child: App()));
 }
 
-class App extends StatelessWidget {
-  final AppConfig config;
-
-  const App({super.key, required this.config});
+class App extends ConsumerWidget {
+  const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutterbooth',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: config.mainColor),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncConfig = ref.watch(configProvider);
+
+    return asyncConfig.when(
+      data: (config) => MaterialApp(
+        title: 'Flutterbooth',
+        builder: (context, child) {
+          return FbKeyboardListener(child: child ?? SizedBox.shrink());
+        },
+        home: HomeScreen(config: config),
       ),
-      home: HomeScreen(config: config),
+      loading: () => const MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (error, stack) => MaterialApp(
+        home: Scaffold(
+          body: Center(child: Text('Error loading config: $error')),
+        ),
+      ),
     );
   }
 }
