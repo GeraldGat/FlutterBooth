@@ -74,7 +74,7 @@ final class ConfigNotifierProvider
   ConfigNotifier create() => ConfigNotifier();
 }
 
-String _$configNotifierHash() => r'1a70c0b9ddc90493bf80d73ad88f32911083045a';
+String _$configNotifierHash() => r'561d9177d69c7bc6787b0f885a647b7c2b621d40';
 
 abstract class _$ConfigNotifier extends $AsyncNotifier<AppConfig> {
   FutureOr<AppConfig> build();

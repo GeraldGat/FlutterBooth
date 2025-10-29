@@ -2,35 +2,33 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutterbooth/models/app_config.dart';
+import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:crypto/crypto.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../models/app_config.dart';
-import '../services/config_service.dart';
-
-class SettingsScreen extends StatefulWidget {
-  final AppConfig initialConfig;
-
-  const SettingsScreen({super.key, required this.initialConfig});
+class SettingsScreen extends ConsumerStatefulWidget {
+  const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  late AppConfig _config;
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   int _currentIndex = 0;
   List<String> fonts = [];
+  late AppConfig _config;
 
   @override
   void initState() {
     super.initState();
-    _config = widget.initialConfig;
     fonts = GoogleFonts.asMap().keys.toList()..sort();
+    _config = ref.read(configProvider).requireValue;
   }
 
   Future<void> _pickFile(Function(String) onSelected,
@@ -44,7 +42,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  /// Sauvegarde avec hash du mot de passe
   Future<void> _saveConfig() async {
     final toSave = _config.copyWith(
       adminPassword: _config.adminPassword?.isEmpty ?? true
@@ -52,13 +49,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           : sha256.convert(utf8.encode(_config.adminPassword ?? "")).toString(),
     );
 
-    await ConfigService().saveConfig(toSave);
+    await ref.read(configProvider.notifier).save(toSave);
     if (mounted) {
       Navigator.pop(context, true);
     }
   }
 
-  /// Champ texte générique
   Widget _buildTextField(String label, String value, Function(String) onChanged,
       {bool obscure = false}) {
     return Container(
@@ -72,7 +68,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// Champ selection font
   Widget _buildFontFamilyField(String label, String value, Function(String) onChanged) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -85,7 +80,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// Champ couleur avec preview
   Widget _buildColorField(String label, Color color, String value, Function(String) onChanged) {
     final controller = TextEditingController(text: value);
     return Container(
@@ -132,7 +126,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// Champ fichier image avec preview
   Widget _buildImageField(String label, Widget image, String? path, Function(String) onChanged) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -156,7 +149,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// Champ fichier SVG avec preview
   Widget _buildSvgField(String label, Widget svg, String? path, Function(String) onChanged) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -180,7 +172,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// Champ raccourci clavier
   Widget _buildShortcutField(String label, int keyId, Function(int) onChanged) {
     final controller = TextEditingController(text: LogicalKeyboardKey(keyId).keyLabel);
     return Container(
@@ -244,7 +235,6 @@ Widget build(BuildContext context) {
 }
 
 
-  /// Onglet Settings
   Widget _buildSettingsTab() {
     return ListView(
       padding: const EdgeInsets.all(8),
@@ -264,7 +254,6 @@ Widget build(BuildContext context) {
     );
   }
 
-  /// Onglet Wallpapers
   Widget _buildWallpapersTab() {
     return ListView(
       padding: const EdgeInsets.all(8),
@@ -289,7 +278,6 @@ Widget build(BuildContext context) {
     );
   }
 
-  /// Onglet Icons
   Widget _buildIconsTab() {
     return ListView(
       padding: const EdgeInsets.all(8),
@@ -316,7 +304,6 @@ Widget build(BuildContext context) {
     );
   }
 
-  /// Onglet Texts
   Widget _buildTextsTab() {
     return ListView(
       padding: const EdgeInsets.all(8),
@@ -331,7 +318,6 @@ Widget build(BuildContext context) {
     );
   }
 
-  /// Onglet Shortcuts
   Widget _buildShortcutsTab() {
     return ListView(
       padding: const EdgeInsets.all(8),

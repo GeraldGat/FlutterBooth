@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 
-import 'package:flutterbooth/models/app_config.dart';
 import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
+import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:mime/mime.dart';
 
-class GalleryScreen extends StatefulWidget {
+class GalleryScreen extends ConsumerStatefulWidget {
   final String imageFolder;
-  final AppConfig appConfig;
 
-  const GalleryScreen({super.key, required this.imageFolder, required this.appConfig});
+  const GalleryScreen({super.key, required this.imageFolder});
 
   @override
-  State<GalleryScreen> createState() => _GalleryScreenState();
+  ConsumerState<GalleryScreen> createState() => _GalleryScreenState();
 }
 
-class _GalleryScreenState extends State<GalleryScreen> {
+class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   List<String> allImages = [];
 
   int currentPage = 0;
@@ -119,7 +119,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
           context,
           MaterialPageRoute(
             builder: (_) => ResultScreen(
-              appConfig: widget.appConfig,
               image: imageWidget,
             ),
           ),
@@ -133,7 +132,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
   Widget build(BuildContext context) {
     const spacing = 10.0;
     final screenSize = MediaQuery.of(context).size;
-    final availableWidth = screenSize.width - (96 + 10) * 2; // espace pour les boutons gauche/droite
+    final availableWidth = screenSize.width - (96 + 10) * 2;
     final availableHeight = screenSize.height * 0.9;
     double imageHeight = (availableHeight - spacing) / 2;
     double imageWidth = imageHeight * 3 / 2;
@@ -143,117 +142,123 @@ class _GalleryScreenState extends State<GalleryScreen> {
       imageHeight = imageWidth * 2 / 3;
     }
 
-    return FbKeyboardActions(
-      onPrevious: _handlePrev,
-      onNext: _handleNext,
-      onConfirm: _handleEnter,
-      child: Scaffold(
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            widget.appConfig.gallery(
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-            ),
+    final asyncConfig = ref.watch(configProvider);
 
-            // Bouton précédent (gauche)
-            if (actionList[0].$1 == true)
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: IconButton(
-                    onPressed: _previousPage,
-                    icon: widget.appConfig.prevIcon(
-                      width: 96,
-                      height: 96,
-                      colorFilter:
-                          ColorFilter.mode(selectedIndex == 0 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
-                    ),
-                  ),
-                ),
+    return asyncConfig.when(
+      data: (config) => FbKeyboardActions(
+        onPrevious: _handlePrev,
+        onNext: _handleNext,
+        onConfirm: _handleEnter,
+        child: Scaffold(
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              config.gallery(
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
               ),
-            
-            // Images centrales
-            Center(
-              child: SizedBox(
-                width: imageWidth * 2 + spacing,
-                height: imageHeight * 2 + spacing,
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: spacing,
-                    mainAxisSpacing: spacing,
-                    childAspectRatio: 3/2,
-                  ),
-                  itemCount: currentImages.length,
-                  itemBuilder: (context, index) {
-                    final isSelected = selectedIndex == index + 1;
-                    return GestureDetector(
-                      onTap: () => setState(() => selectedIndex = index + 1),
-                      onDoubleTap: () => _openImage(index),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: isSelected 
-                                ? widget.appConfig.mainColor
-                                : Colors.transparent,
-                            width: 4,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            File(currentImages[index]),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+
+              if (actionList[0].$1 == true)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: IconButton(
+                      onPressed: _previousPage,
+                      icon: config.prevIcon(
+                        width: 96,
+                        height: 96,
+                        colorFilter:
+                            ColorFilter.mode(selectedIndex == 0 ? config.mainColor : config.accentColor, BlendMode.srcIn),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            // Bouton suivant (droite)
-            if (actionList[5].$1 == true)
-              Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: IconButton(
-                    onPressed: _nextPage,
-                    icon: widget.appConfig.nextIcon(
-                      width: 96,
-                      height: 96,
-                      colorFilter:
-                          ColorFilter.mode(selectedIndex == 5 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
                     ),
+                  ),
+                ),
+              
+              Center(
+                child: SizedBox(
+                  width: imageWidth * 2 + spacing,
+                  height: imageHeight * 2 + spacing,
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: spacing,
+                      mainAxisSpacing: spacing,
+                      childAspectRatio: 3/2,
+                    ),
+                    itemCount: currentImages.length,
+                    itemBuilder: (context, index) {
+                      final isSelected = selectedIndex == index + 1;
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedIndex = index + 1),
+                        onDoubleTap: () => _openImage(index),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: isSelected 
+                                  ? config.mainColor
+                                  : Colors.transparent,
+                              width: 4,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              File(currentImages[index]),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
 
-            // Bouton fermer (en haut à droite)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: IconButton(
-                onPressed: _closeScreen,
-                icon: widget.appConfig.closeIcon(
-                  width: 96,
-                  height: 96,
-                  colorFilter:
-                      ColorFilter.mode(selectedIndex == 6 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
+              if (actionList[5].$1 == true)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: IconButton(
+                      onPressed: _nextPage,
+                      icon: config.nextIcon(
+                        width: 96,
+                        height: 96,
+                        colorFilter:
+                            ColorFilter.mode(selectedIndex == 5 ? config.mainColor : config.accentColor, BlendMode.srcIn),
+                      ),
+                    ),
+                  ),
+                ),
+
+              Positioned(
+                top: 0,
+                right: 0,
+                child: IconButton(
+                  onPressed: _closeScreen,
+                  icon: config.closeIcon(
+                    width: 96,
+                    height: 96,
+                    colorFilter:
+                        ColorFilter.mode(selectedIndex == 6 ? config.mainColor : config.accentColor, BlendMode.srcIn),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => Scaffold(
+        body: Center(child: Text('Error loading config: $error')),
       ),
     );
   }

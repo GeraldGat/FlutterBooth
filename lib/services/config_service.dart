@@ -4,46 +4,28 @@ import 'dart:io';
 import '../models/app_config.dart';
 
 class ConfigService {
-  AppConfig? currentConfig;
-  static const String _fileName = "config.json";
-
-  static final ConfigService _instance = ConfigService._internal();
-
-  factory ConfigService() {
-    return _instance;
-  }
-  ConfigService._internal();
+  static const String _fileName = "flutterbooth_config.json";
 
   Future<File> _getConfigFile() async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await getApplicationCacheDirectory();
     return File("${dir.path}/$_fileName");
   }
 
-  Future<AppConfig?> loadConfig({bool forceReload = false}) async {
-    if (currentConfig != null && forceReload == false) {
-      return currentConfig;
-    }
-
+  Future<AppConfig?> loadConfig() async {
     final file = await _getConfigFile();
     if (await file.exists()) {
       final content = await file.readAsString();
       final data = jsonDecode(content);
-      currentConfig = AppConfig.fromJson(data);
-      return currentConfig;
+      return AppConfig.fromJson(data);
     }
     return null;
   }
 
   Future<AppConfig> getConfig() async {
-    if (currentConfig != null) {
-      return currentConfig!;
-    }
-    currentConfig = await loadConfig() ?? AppConfig();
-    return currentConfig!;
+    return await loadConfig() ?? AppConfig();
   }
 
   Future<void> saveConfig(AppConfig config) async {
-    currentConfig = config;
     final file = await _getConfigFile();
     await file.writeAsString(jsonEncode(config.toJson()));
   }

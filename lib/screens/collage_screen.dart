@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 
-import 'package:flutterbooth/models/app_config.dart';
 import 'package:flutterbooth/models/collage.dart';
 import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
+import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:flutterbooth/services/capture_service.dart';
 
-class CollageScreen extends StatefulWidget {
-  final AppConfig appConfig;
+class CollageScreen extends ConsumerStatefulWidget {
   final List<Collage> collages;
 
-  const CollageScreen({super.key, required this.appConfig, required this.collages});
+  const CollageScreen({super.key, required this.collages});
 
   @override
-  State<CollageScreen> createState() => _CollageScreenState();
+  ConsumerState<CollageScreen> createState() => _CollageScreenState();
 }
 
-class _CollageScreenState extends State<CollageScreen> {
+class _CollageScreenState extends ConsumerState<CollageScreen> {
   int currentPage = 0;
   int selectedIndex = 1;
   List<(bool, Function)> get actionList {
@@ -91,18 +91,16 @@ class _CollageScreenState extends State<CollageScreen> {
   }
 
   void _makeCollage(Collage collage) async {
-    final tempDir = "/home/ggatouillat/Development/flutterbooth/temp"; // ou un dossier configuré dans ton app
+    final tempDir = "/home/ggatouillat/Development/flutterbooth/temp"; // TODO: change path
     final captureService = CaptureService(tempDir);
     final List<String> capturedImages = [];
 
     for (int i = 0; i < collage.imageCount; i++) {
-      // Étape 1 : afficher le décompte avant chaque capture
       if (mounted) {
         capturedImages.add(await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => CountdownAndCaptureScreen(
-              appConfig: widget.appConfig,
               onCapture: () async {
                 final path = await captureService.capture();
 
@@ -116,7 +114,6 @@ class _CollageScreenState extends State<CollageScreen> {
       }
     }
 
-    // Étape 3 : construire le collage final
     final outputPath = "$tempDir/collage_${DateTime.now().millisecondsSinceEpoch}.jpg";
     final success = collage.buildCollage(capturedImages, outputPath);
 
@@ -125,7 +122,6 @@ class _CollageScreenState extends State<CollageScreen> {
         context,
         MaterialPageRoute(
           builder: (_) => ResultScreen(
-            appConfig: widget.appConfig,
             image: Image.file(File(outputPath)),
           ),
         ),
@@ -137,7 +133,7 @@ class _CollageScreenState extends State<CollageScreen> {
   Widget build(BuildContext context) {
     const spacing = 10.0;
     final screenSize = MediaQuery.of(context).size;
-    final availableWidth = screenSize.width - (96 + 10) * 2; // espace pour les boutons gauche/droite
+    final availableWidth = screenSize.width - (96 + 10) * 2;
     final availableHeight = screenSize.height * 0.9;
     double imageHeight = (availableHeight - spacing) / 2;
     double imageWidth = imageHeight * 3 / 2;
@@ -147,116 +143,122 @@ class _CollageScreenState extends State<CollageScreen> {
       imageHeight = imageWidth * 2 / 3;
     }
 
-    return FbKeyboardActions(
-      onPrevious: _handlePrev,
-      onNext: _handleNext,
-      onConfirm: _handleEnter,
-      child: Scaffold(
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            widget.appConfig.collage(
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-            ),
+    final asyncConfig = ref.watch(configProvider);
 
-            // Bouton précédent (gauche)
-            if (actionList[0].$1 == true)
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: IconButton(
-                    onPressed: _previousPage,
-                    icon: widget.appConfig.prevIcon(
-                      width: 96,
-                      height: 96,
-                      colorFilter:
-                          ColorFilter.mode(selectedIndex == 4 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
-                    ),
-                  ),
-                ),
+    return asyncConfig.when(
+      data: (config) => FbKeyboardActions(
+        onPrevious: _handlePrev,
+        onNext: _handleNext,
+        onConfirm: _handleEnter,
+        child: Scaffold(
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              config.collage(
+                width: double.infinity,
+                height: double.infinity,
+                fit: BoxFit.cover,
               ),
-            
-            // Images centrales
-            Center(
-              child: SizedBox(
-                width: imageWidth * 2 + spacing,
-                height: imageHeight * 2 + spacing,
-                child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: spacing,
-                    mainAxisSpacing: spacing,
-                    childAspectRatio: 3/2,
-                  ),
-                  itemCount: currentCollages.length,
-                  itemBuilder: (context, index) {
-                    final isSelected = selectedIndex == index + 1;
-                    return GestureDetector(
-                      onTap: () => setState(() => selectedIndex = index + 1),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: isSelected 
-                                ? widget.appConfig.mainColor
-                                : Colors.transparent,
-                            width: 4,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            File(currentCollages[index].thumbnailAsset),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+
+              if (actionList[0].$1 == true)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: IconButton(
+                      onPressed: _previousPage,
+                      icon: config.prevIcon(
+                        width: 96,
+                        height: 96,
+                        colorFilter:
+                            ColorFilter.mode(selectedIndex == 4 ? config.mainColor : config.accentColor, BlendMode.srcIn),
                       ),
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            // Bouton suivant (droite)
-            if (actionList[5].$1 == true)
-              Positioned(
-                right: 0,
-                top: 0,
-                bottom: 0,
-                child: Center(
-                  child: IconButton(
-                    onPressed: _nextPage,
-                    icon: widget.appConfig.nextIcon(
-                      width: 96,
-                      height: 96,
-                      colorFilter:
-                          ColorFilter.mode(selectedIndex == 5 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
                     ),
+                  ),
+                ),
+              
+              Center(
+                child: SizedBox(
+                  width: imageWidth * 2 + spacing,
+                  height: imageHeight * 2 + spacing,
+                  child: GridView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: spacing,
+                      mainAxisSpacing: spacing,
+                      childAspectRatio: 3/2,
+                    ),
+                    itemCount: currentCollages.length,
+                    itemBuilder: (context, index) {
+                      final isSelected = selectedIndex == index + 1;
+                      return GestureDetector(
+                        onTap: () => setState(() => selectedIndex = index + 1),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: isSelected 
+                                  ? config.mainColor
+                                  : Colors.transparent,
+                              width: 4,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              File(currentCollages[index].thumbnailAsset),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
 
-            // Bouton fermer (en haut à droite)
-            Positioned(
-              top: 0,
-              right: 0,
-              child: IconButton(
-                onPressed: _closeScreen,
-                icon: widget.appConfig.closeIcon(
-                  width: 96,
-                  height: 96,
-                  colorFilter:
-                      ColorFilter.mode(selectedIndex == 6 ? widget.appConfig.mainColor : widget.appConfig.accentColor, BlendMode.srcIn),
+              if (actionList[5].$1 == true)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: IconButton(
+                      onPressed: _nextPage,
+                      icon: config.nextIcon(
+                        width: 96,
+                        height: 96,
+                        colorFilter:
+                            ColorFilter.mode(selectedIndex == 5 ? config.mainColor : config.accentColor, BlendMode.srcIn),
+                      ),
+                    ),
+                  ),
+                ),
+
+              Positioned(
+                top: 0,
+                right: 0,
+                child: IconButton(
+                  onPressed: _closeScreen,
+                  icon: config.closeIcon(
+                    width: 96,
+                    height: 96,
+                    colorFilter:
+                        ColorFilter.mode(selectedIndex == 6 ? config.mainColor : config.accentColor, BlendMode.srcIn),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+      ),
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (error, stack) => Scaffold(
+        body: Center(child: Text('Error loading config: $error')),
       ),
     );
   }

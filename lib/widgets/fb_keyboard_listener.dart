@@ -48,8 +48,8 @@ class FbKeyboardListener extends ConsumerWidget {
         },
         child: child,
       ),
-      loading: () => child, // Afficher sans shortcuts pendant le chargement
-      error: (_, __) => child, // Afficher sans shortcuts en cas d'erreur
+      loading: () => child,
+      error: (_, __) => child,
     );
   }
 }

@@ -1,4 +1,3 @@
-// lib/providers/config_provider.dart
 import 'package:flutterbooth/models/app_config.dart';
 import 'package:flutterbooth/services/config_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,22 +13,15 @@ ConfigService configService(Ref ref) {
 class ConfigNotifier extends _$ConfigNotifier {
   @override
   FutureOr<AppConfig> build() async {
-    final service = ref.watch(configServiceProvider);
-    final config = await service.getConfig();
+    ConfigService configService = ref.read(configServiceProvider);
+    final config = await configService.getConfig();
+    state = AsyncData(config);
     return config;
   }
 
-  Future<void> reload() async {
-    final service = ref.read(configServiceProvider);
-    final newConfig = await service.loadConfig(forceReload: true);
-    if (newConfig != null) {
-      state = AsyncData(newConfig);
-    }
-  }
-
   Future<void> save(AppConfig newConfig) async {
-    final service = ref.read(configServiceProvider);
-    await service.saveConfig(newConfig);
+    ConfigService configService = ref.read(configServiceProvider);
+    await configService.saveConfig(newConfig);
     state = AsyncData(newConfig);
   }
 }

@@ -23,7 +23,7 @@ class CaptureService {
         return fullPath;
       }
     } catch (e) {
-      // Erreur si problème avec gphoto2
+       // Error in gphoto2 execution
     }
     return null;
   }
