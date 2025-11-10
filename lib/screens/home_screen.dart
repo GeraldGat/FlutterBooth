@@ -17,7 +17,6 @@ import 'package:flutterbooth/screens/settings_screen.dart';
 import 'package:flutterbooth/services/capture_service.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:flutterbooth/widgets/rotationg_menu.dart';
-import 'package:path_provider/path_provider.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -108,8 +107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     IconButton(
                       onPressed: () async {
-                        final temporaryPath = await getTemporaryDirectory();
-                        final captureService = CaptureService(temporaryPath.path);
+                        final captureService = CaptureService(config.fileSavePath);
                         if (!context.mounted) return;
                         Navigator.push(
                           context,
@@ -157,7 +155,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => GalleryScreen(
-                              imageFolder: "/home/ggatouillat/Development/flutterbooth/temp",
+                              imageFolder: config.fileSavePath,
                             ),
                           ),
                         );

@@ -23,11 +23,11 @@ class TwoCollage extends Collage {
       final image1 = img.decodeImage(File(images[0]).readAsBytesSync())!;
       final image2 = img.decodeImage(File(images[1]).readAsBytesSync())!;
 
-      final rotated1 = img.copyRotate(image1, angle: 90);
-      final rotated2 = img.copyRotate(image2, angle: 90);
+      final rotated1 = img.copyRotate(image1, angle: 270);
+      final rotated2 = img.copyRotate(image2, angle: 270);
       
-      final cropped1 = img.copyResize(rotated1, width: collageFinalWidth ~/ 2, height: collageFinalHeight, maintainAspect: true, backgroundColor: img.ColorInt32.rgb(255, 255, 255));
-      final cropped2 = img.copyResize(rotated2, width: collageFinalWidth ~/ 2, height: collageFinalHeight, maintainAspect: true, backgroundColor: img.ColorInt32.rgb(255, 255, 255));
+      final cropped1 = copyResizeAndCrop(rotated1, width: collageFinalWidth ~/ 2, height: collageFinalHeight);
+      final cropped2 = copyResizeAndCrop(rotated2, width: collageFinalWidth ~/ 2, height: collageFinalHeight);
 
       final collage = img.Image(width: collageFinalWidth, height: collageFinalHeight);
       

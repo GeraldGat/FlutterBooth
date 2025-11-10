@@ -31,14 +31,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     _config = ref.read(configProvider).requireValue;
   }
 
-  Future<void> _pickFile(Function(String) onSelected,
-      {List<String>? allowedExtensions}) async {
+  Future<void> _pickFile(Function(String) onSelected, {List<String>? allowedExtensions}) async {
     final result = await FilePicker.platform.pickFiles(
       type: allowedExtensions == null ? FileType.any : FileType.custom,
       allowedExtensions: allowedExtensions,
     );
     if (result != null && result.files.single.path != null) {
       onSelected(result.files.single.path!);
+    }
+  }
+  
+  Future<void> _pickDirectory(Function(String) onSelected) async {
+    final result = await FilePicker.platform.getDirectoryPath();
+    if (result != null) {
+      onSelected(result);
     }
   }
 
@@ -76,6 +82,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
         items: fonts.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
         onChanged: (val) => onChanged(val ?? value),
+      ),
+    );
+  }
+
+  Widget _buildDirectoryField(String label, String? path, Function(String) onChanged) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              readOnly: true,
+              controller: TextEditingController(text: path),
+              decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.folder_open),
+            onPressed: () => _pickDirectory(onChanged),
+          ),
+        ],
       ),
     );
   }
@@ -239,6 +266,8 @@ Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
+        _buildDirectoryField("File save path", _config.fileSavePath,
+            (v) => setState(() => _config = _config.copyWith(fileSavePath: v))),
         _buildImageField("Event Logo", _config.eventLogo(width: 80, height: 80), _config.eventLogoPath,
             (v) => setState(() => _config = _config.copyWith(eventLogoPath: v))),
         _buildTextField("Home text", _config.homeText,

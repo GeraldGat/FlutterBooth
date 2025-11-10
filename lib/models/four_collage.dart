@@ -25,10 +25,10 @@ class FourCollage extends Collage {
       final image3 = img.decodeImage(File(images[2]).readAsBytesSync())!;
       final image4 = img.decodeImage(File(images[3]).readAsBytesSync())!;
       
-      final cropped1 = img.copyResize(image1, width: collageFinalWidth ~/ 2, height: collageFinalHeight ~/ 2, maintainAspect: true, backgroundColor: img.ColorInt32.rgb(255, 255, 255));
-      final cropped2 = img.copyResize(image2, width: collageFinalWidth ~/ 2, height: collageFinalHeight ~/ 2, maintainAspect: true, backgroundColor: img.ColorInt32.rgb(255, 255, 255));
-      final cropped3 = img.copyResize(image3, width: collageFinalWidth ~/ 2, height: collageFinalHeight ~/ 2, maintainAspect: true, backgroundColor: img.ColorInt32.rgb(255, 255, 255));
-      final cropped4 = img.copyResize(image4, width: collageFinalWidth ~/ 2, height: collageFinalHeight ~/ 2, maintainAspect: true, backgroundColor: img.ColorInt32.rgb(255, 255, 255));
+      final cropped1 = copyResizeAndCrop(image1, width: collageFinalWidth ~/ 2, height: collageFinalHeight ~/ 2);
+      final cropped2 = copyResizeAndCrop(image2, width: collageFinalWidth ~/ 2, height: collageFinalHeight ~/ 2);
+      final cropped3 = copyResizeAndCrop(image3, width: collageFinalWidth ~/ 2, height: collageFinalHeight ~/ 2);
+      final cropped4 = copyResizeAndCrop(image4, width: collageFinalWidth ~/ 2, height: collageFinalHeight ~/ 2);
 
       final collage = img.Image(width: collageFinalWidth, height: collageFinalHeight);
       

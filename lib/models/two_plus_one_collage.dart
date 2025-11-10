@@ -24,18 +24,18 @@ class TwoPlusOneCollage extends Collage {
       final image2 = img.decodeImage(File(images[1]).readAsBytesSync())!;
       final image3 = img.decodeImage(File(images[2]).readAsBytesSync())!;
 
-      final rotated2 = img.copyRotate(image2, angle: 90);
-      final rotated3 = img.copyRotate(image3, angle: 90);
+      final rotated2 = img.copyRotate(image2, angle: 270);
+      final rotated3 = img.copyRotate(image3, angle: 270);
       
-      final cropped1 = img.copyResize(image1, width: collageFinalWidth * 2 ~/ 3, height: collageFinalHeight, maintainAspect: true, backgroundColor: img.ColorInt32.rgb(255, 255, 255));
-      final cropped2 = img.copyResize(rotated2, width: collageFinalWidth ~/ 3, height: collageFinalHeight ~/ 2, maintainAspect: true, backgroundColor: img.ColorInt32.rgb(255, 255, 255));
-      final cropped3 = img.copyResize(rotated3, width: collageFinalWidth ~/ 3, height: collageFinalHeight ~/ 2, maintainAspect: true, backgroundColor: img.ColorInt32.rgb(255, 255, 255));
+      final cropped1 = copyResizeAndCrop(image1, width: (collageFinalWidth ~/ 3) * 2, height: collageFinalHeight);
+      final cropped2 = copyResizeAndCrop(rotated2, width: collageFinalWidth ~/ 3, height: collageFinalHeight ~/ 2);
+      final cropped3 = copyResizeAndCrop(rotated3, width: collageFinalWidth ~/ 3, height: collageFinalHeight ~/ 2);
 
       final collage = img.Image(width: collageFinalWidth, height: collageFinalHeight);
       
       img.compositeImage(collage, cropped1, dstX: 0, dstY: 0);
-      img.compositeImage(collage, cropped2, dstX: collageFinalWidth ~/ 3, dstY: 0);
-      img.compositeImage(collage, cropped3, dstX: collageFinalWidth ~/ 3, dstY: collageFinalHeight ~/ 2);
+      img.compositeImage(collage, cropped2, dstX: (collageFinalWidth ~/ 3) * 2, dstY: 0);
+      img.compositeImage(collage, cropped3, dstX: (collageFinalWidth ~/ 3) * 2, dstY: collageFinalHeight ~/ 2);
 
       File(outputPath).writeAsBytesSync(img.encodeJpg(collage, quality: 100));
     } catch (e) {

@@ -1,5 +1,6 @@
 class AppConfig {
   // Settings
+  String fileSavePath;
   String eventLogoPath;
   String homeText;
   String mainColorHex;
@@ -39,6 +40,7 @@ class AppConfig {
   int shortcutEnterLogicalKeyId;
 
   AppConfig({
+    this.fileSavePath = "saved/",
     this.eventLogoPath = "assets/images/photobooth_logo.png",
     this.homeText = "Use the button below",
     this.mainColorHex = "FF4E4E7B",
@@ -71,6 +73,7 @@ class AppConfig {
   });
 
   AppConfig copyWith({
+    String? fileSavePath,
     String? eventLogoPath,
     String? homeText,
     String? mainColorHex,
@@ -102,6 +105,7 @@ class AppConfig {
     int? shortcutEnterLogicalKeyId,
   }) {
     return AppConfig(
+      fileSavePath: fileSavePath ?? this.fileSavePath,
       eventLogoPath: eventLogoPath ?? this.eventLogoPath,
       homeText: homeText ?? this.homeText,
       mainColorHex: mainColorHex ?? this.mainColorHex,
@@ -135,6 +139,7 @@ class AppConfig {
   }
 
   Map<String, dynamic> toJson() => {
+        "fileSavePath": fileSavePath,
         "eventLogoPath": eventLogoPath,
         "homeText": homeText,
         "mainColorHex": mainColorHex,
@@ -167,6 +172,7 @@ class AppConfig {
       };
 
   factory AppConfig.fromJson(Map<String, dynamic> json) => AppConfig(
+        fileSavePath: json["fileSavePath"] ?? "saved/",
         eventLogoPath: json["eventLogoPath"] ?? "assets/images/photobooth_logo.png",
         homeText: json["homeText"] ?? "Use the button below",
         mainColorHex: json["mainColorHex"] ?? "FF4E4E7B",

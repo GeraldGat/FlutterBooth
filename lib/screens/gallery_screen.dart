@@ -22,11 +22,11 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   List<String> allImages = [];
 
   int currentPage = 0;
-  int selectedIndex = 1;
+  int selectedIndex = 6;
   List<(bool, Function)> get actionList {
     return [
       (currentPage > 0, _previousPage),
-      (true, _openSelectedImage),
+      (currentImages.isNotEmpty, _openSelectedImage),
       (currentImages.length > 1, _openSelectedImage),
       (currentImages.length > 2, _openSelectedImage),
       (currentImages.length > 3, _openSelectedImage),
@@ -39,6 +39,10 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   void initState() {
     super.initState();
     _loadImages();
+
+    if (allImages.isNotEmpty) {
+      selectedIndex = 1;
+    }
   }
 
   void _loadImages() {
@@ -48,6 +52,9 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
           .where((file) => lookupMimeType(file.path)?.startsWith('image/') == true)
           .map((file) => file.path)
           .toList();
+
+      files.sort((a, b) => File(b).lastModifiedSync().compareTo(File(a).lastModifiedSync()));
+
       setState(() {
         allImages = files;
       });
@@ -79,7 +86,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   }
 
   void _openSelectedImage() {
-    _openImage(selectedIndex);
+    _openImage(selectedIndex-1);
   }
 
   int _getNextAvailableIndex(int step) {

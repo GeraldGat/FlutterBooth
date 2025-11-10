@@ -10,6 +10,7 @@ import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:flutterbooth/services/capture_service.dart';
+import 'package:path_provider/path_provider.dart';
 
 class CollageScreen extends ConsumerStatefulWidget {
   final List<Collage> collages;
@@ -60,7 +61,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
   }
 
   void _makeSelectedCollage() {
-    _makeCollage(currentCollages[selectedIndex]);
+    _makeCollage(currentCollages[selectedIndex-1]);
   }
 
   int _getNextAvailableIndex(int step) {
@@ -91,8 +92,8 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
   }
 
   void _makeCollage(Collage collage) async {
-    final tempDir = "/home/ggatouillat/Development/flutterbooth/temp"; // TODO: change path
-    final captureService = CaptureService(tempDir);
+    final tempDir = await getTemporaryDirectory();
+    final captureService = CaptureService(tempDir.path);
     final List<String> capturedImages = [];
 
     for (int i = 0; i < collage.imageCount; i++) {
@@ -114,7 +115,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
       }
     }
 
-    final outputPath = "$tempDir/collage_${DateTime.now().millisecondsSinceEpoch}.jpg";
+    final outputPath = "${ref.read(configProvider).requireValue.fileSavePath}/collage_${DateTime.now().millisecondsSinceEpoch}.jpg";
     final success = collage.buildCollage(capturedImages, outputPath);
 
     if (success && mounted) {
@@ -172,7 +173,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
                         width: 96,
                         height: 96,
                         colorFilter:
-                            ColorFilter.mode(selectedIndex == 4 ? config.mainColor : config.accentColor, BlendMode.srcIn),
+                            ColorFilter.mode(selectedIndex == 0 ? config.mainColor : config.accentColor, BlendMode.srcIn),
                       ),
                     ),
                   ),
