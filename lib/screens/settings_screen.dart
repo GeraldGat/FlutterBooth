@@ -279,6 +279,8 @@ Widget build(BuildContext context) {
         _buildTextField("Admin panel password", _config.adminPassword ?? "",
             (v) => setState(() => _config = _config.copyWith(adminPassword: v)),
             obscure: true),
+        _buildTextField("Gphoto2 port", _config.gphotoPort ?? "",
+            (v) => setState(() => _config = _config.copyWith(gphotoPort: v))),
       ],
     );
   }

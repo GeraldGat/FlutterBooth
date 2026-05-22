@@ -6,6 +6,7 @@ class AppConfig {
   String mainColorHex;
   String accentColorHex;
   String? adminPassword;
+  String? gphotoPort;
 
   // Wallpapers
   String mainWallpaperPath;
@@ -46,6 +47,7 @@ class AppConfig {
     this.mainColorHex = "FF4E4E7B",
     this.accentColorHex = "994E4E7B",
     this.adminPassword,
+    this.gphotoPort,
     this.mainWallpaperPath = "assets/images/photobooth_background.png",
     this.countdown3Path,
     this.countdown2Path,
@@ -79,6 +81,7 @@ class AppConfig {
     String? mainColorHex,
     String? accentColorHex,
     String? adminPassword,
+    String? gphotoPort,
     String? mainWallpaperPath,
     String? countdown3Path,
     String? countdown2Path,
@@ -111,6 +114,7 @@ class AppConfig {
       mainColorHex: mainColorHex ?? this.mainColorHex,
       accentColorHex: accentColorHex ?? this.accentColorHex,
       adminPassword: adminPassword ?? this.adminPassword,
+      gphotoPort: gphotoPort ?? this.gphotoPort,
       mainWallpaperPath: mainWallpaperPath ?? this.mainWallpaperPath,
       countdown3Path: countdown3Path ?? this.countdown3Path,
       countdown2Path: countdown2Path ?? this.countdown2Path,
@@ -145,6 +149,7 @@ class AppConfig {
         "mainColorHex": mainColorHex,
         "accentColorHex": accentColorHex,
         "adminPassword": adminPassword,
+        "gphotoPort": gphotoPort,
         "mainWallpaperPath": mainWallpaperPath,
         "countdown3Path": countdown3Path,
         "countdown2Path": countdown2Path,
@@ -178,6 +183,7 @@ class AppConfig {
         mainColorHex: json["mainColorHex"] ?? "FF4E4E7B",
         accentColorHex: json["accentColorHex"] ?? "994E4E7B",
         adminPassword: json["adminPassword"],
+        gphotoPort: json["gphotoPort"],
         mainWallpaperPath: json["mainWallpaperPath"] ?? "assets/images/photobooth_background.png",
         countdown3Path: json["countdown3Path"],
         countdown2Path: json["countdown2Path"],

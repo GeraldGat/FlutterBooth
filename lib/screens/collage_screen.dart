@@ -93,25 +93,40 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
 
   void _makeCollage(Collage collage) async {
     final tempDir = await getTemporaryDirectory();
-    final captureService = CaptureService(tempDir.path);
+    final captureService = CaptureService(tempDir.path, ref.read(configProvider).requireValue.gphotoPort);
     final List<String> capturedImages = [];
 
     for (int i = 0; i < collage.imageCount; i++) {
       if (mounted) {
-        capturedImages.add(await Navigator.push(
+        dynamic captureReturn = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => CountdownAndCaptureScreen(
               onCapture: () async {
                 final path = await captureService.capture();
 
-                if (path != null && mounted) {
-                  Navigator.pop(context, path);
+                if (mounted) {
+                  if (path != null) {
+                    Navigator.pop(context, path);
+                  } else {
+                    Navigator.pop(context, false);
+                  }
                 }
               },
             ),
           ),
-        ));
+        );
+
+        if (captureReturn == false) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Erreur lors de la capture de la photo")),
+            );
+            Navigator.pop(context);
+          }
+        }
+
+        capturedImages.add(captureReturn);
       }
     }
 

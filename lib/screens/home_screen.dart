@@ -107,7 +107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     IconButton(
                       onPressed: () async {
-                        final captureService = CaptureService(config.fileSavePath);
+                        final captureService = CaptureService(config.fileSavePath, config.gphotoPort);
                         if (!context.mounted) return;
                         Navigator.push(
                           context,
