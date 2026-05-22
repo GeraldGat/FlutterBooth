@@ -6,6 +6,12 @@ import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:flutterbooth/widgets/rotationg_menu.dart';
 
+enum ResultScreenReturn {
+  back,
+  print,
+  delete,
+}
+
 class ResultScreen extends ConsumerStatefulWidget {
   final Image image;
 
@@ -76,7 +82,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                       IconButton(
                         onPressed: () {
                           if (mounted) {
-                            Navigator.pop(context, true);
+                            Navigator.pop(context, ResultScreenReturn.back);
                           }
                         },
                         icon: config.backIcon(
@@ -108,7 +114,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                             if (file.existsSync()) {
                               file.deleteSync();
                               if (mounted) {
-                                Navigator.pop(context, true);
+                                Navigator.pop(context, ResultScreenReturn.delete);
                               }
                             }
                           }

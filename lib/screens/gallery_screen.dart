@@ -116,13 +116,13 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     }
   }
 
-  void _openImage(int index) {
+  void _openImage(int index) async {
     if (index < currentImages.length) {
       final path = currentImages[index];
       final imageWidget = Image.file(File(path));
       
       if (context.mounted) {
-        Navigator.push(
+        final resultScreenReturn = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => ResultScreen(
@@ -130,7 +130,19 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
             ),
           ),
         );
-        // TODO: Change ResultScreen return and delete image from list if removed
+
+        if (resultScreenReturn == ResultScreenReturn.delete) {
+          setState(() {
+            allImages.removeAt(currentPage * 4 + index);
+            if (currentImages.isEmpty) {
+              selectedIndex = 6;
+              if (currentPage > 0) {
+                currentPage--;
+                selectedIndex = 1;
+              }
+            }
+          });
+        }
       }
     }
   }
