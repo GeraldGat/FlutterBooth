@@ -132,7 +132,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 } else {
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Erreur lors de la capture de la photo")),
+                                      const SnackBar(content: Text("An error occured while capturing image.")),
                                     );
                                     Navigator.pop(context);
                                   }

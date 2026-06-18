@@ -120,7 +120,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
         if (captureReturn == false) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Erreur lors de la capture de la photo")),
+              const SnackBar(content: Text("An error occured while capturing image.")),
             );
             Navigator.pop(context);
           }
