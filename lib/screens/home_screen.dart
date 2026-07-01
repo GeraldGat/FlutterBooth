@@ -130,7 +130,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                                   final imageFile = File(path);
 
-                                  if (imageFile.existsSync()) {
+                                  if (!imageFile.existsSync()) {
                                     showCaptureError(context);
                                     return;
                                   }
