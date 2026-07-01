@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
-import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.dart';
-import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'dart:io';
-import 'package:flutterbooth/providers/config_provider.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
-import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
+import 'package:flutterbooth/widgets/paged_grid_screen.dart';
 import 'package:mime/mime.dart';
 
 class GalleryScreen extends ConsumerStatefulWidget {
@@ -21,28 +18,10 @@ class GalleryScreen extends ConsumerStatefulWidget {
 class _GalleryScreenState extends ConsumerState<GalleryScreen> {
   List<String> allImages = [];
 
-  int currentPage = 0;
-  int selectedIndex = 6;
-  List<(bool, Function)> get actionList {
-    return [
-      (currentPage > 0, _previousPage),
-      (currentImages.isNotEmpty, _openSelectedImage),
-      (currentImages.length > 1, _openSelectedImage),
-      (currentImages.length > 2, _openSelectedImage),
-      (currentImages.length > 3, _openSelectedImage),
-      ((currentPage + 1) * 4 < allImages.length, _nextPage),
-      (true, _closeScreen),
-    ];
-  }
-  
   @override
   void initState() {
     super.initState();
     _loadImages();
-
-    if (allImages.isNotEmpty) {
-      selectedIndex = 1;
-    }
   }
 
   void _loadImages() {
@@ -61,66 +40,11 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     }
   }
 
-  List<String> get currentImages {
-    final start = currentPage * 4;
-    final end = (start + 4).clamp(0, allImages.length);
-    return allImages.sublist(start, end);
-  }
-
-  void _previousPage() {
-    setState(() {
-      currentPage--;
-    });
-  }
-
-  void _nextPage() {
-    setState(() {
-      currentPage++;
-    });
-  }
-
-  void _closeScreen() {
-    if (mounted) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  void _openSelectedImage() {
-    _openImage(selectedIndex-1);
-  }
-
-  int _getNextAvailableIndex(int step) {
-    int nextIndex = selectedIndex;
-
-    for (int i = 0; i < actionList.length; i++) {
-      nextIndex = (nextIndex + step + 7) % 7;
-      if (actionList[nextIndex].$1 == true) {
-        return nextIndex;
-      }
-    }
-
-    return selectedIndex;
-  }
-
-  void _handlePrev() {
-    setState(() => selectedIndex = _getNextAvailableIndex(-1));
-  }
-
-  void _handleNext() {
-    setState(() => selectedIndex = _getNextAvailableIndex(1));
-  }
-
-  void _handleEnter() {
-    if (actionList[selectedIndex].$1 == true) {
-      actionList[selectedIndex].$2.call();
-    }
-  }
-
-  void _openImage(int index) async {
-    if (index < currentImages.length) {
-      final path = currentImages[index];
+  Future<void> _openImage(int index) async {
+    if (index < allImages.length) {
+      final path = allImages[index];
       final imageWidget = Image.file(File(path));
-      
+
       if (context.mounted) {
         final resultScreenReturn = await Navigator.push(
           context,
@@ -133,14 +57,7 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
 
         if (resultScreenReturn == ResultScreenReturn.delete) {
           setState(() {
-            allImages.removeAt(currentPage * 4 + index);
-            if (currentImages.isEmpty) {
-              selectedIndex = 6;
-              if (currentPage > 0) {
-                currentPage--;
-                selectedIndex = 1;
-              }
-            }
+            allImages.removeAt(index);
           });
         }
       }
@@ -149,136 +66,19 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const spacing = 10.0;
-    final screenSize = MediaQuery.of(context).size;
-    final availableWidth = screenSize.width - (96 + 10) * 2;
-    final availableHeight = screenSize.height * 0.9;
-    double imageHeight = (availableHeight - spacing) / 2;
-    double imageWidth = imageHeight * 3 / 2;
-
-    if (availableWidth < (imageWidth * 2 + spacing)) {
-      imageWidth = (availableWidth - spacing) / 2;
-      imageHeight = imageWidth * 2 / 3;
-    }
-
-    final asyncConfig = ref.watch(configProvider);
-
-    return asyncConfig.when(
-      data: (config) => FbKeyboardActions(
-        onPrevious: _handlePrev,
-        onNext: _handleNext,
-        onConfirm: _handleEnter,
-        child: Scaffold(
-          body: Stack(
-            fit: StackFit.expand,
-            children: [
-              config.gallery(
-                width: double.infinity,
-                height: double.infinity,
-                fit: BoxFit.cover,
-              ),
-
-              if (actionList[0].$1 == true)
-                Positioned(
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: IconButton(
-                      onPressed: _previousPage,
-                      icon: config.prevIcon(
-                        width: 96,
-                        height: 96,
-                        colorFilter:
-                            ColorFilter.mode(selectedIndex == 0 ? config.mainColor : config.accentColor, BlendMode.srcIn),
-                      ),
-                    ),
-                  ),
-                ),
-              
-              Center(
-                child: SizedBox(
-                  width: imageWidth * 2 + spacing,
-                  height: imageHeight * 2 + spacing,
-                  child: GridView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: spacing,
-                      mainAxisSpacing: spacing,
-                      childAspectRatio: 3/2,
-                    ),
-                    itemCount: currentImages.length,
-                    itemBuilder: (context, index) {
-                      final isSelected = selectedIndex == index + 1;
-                      return GestureDetector(
-                        onTap: () => setState(() => selectedIndex = index + 1),
-                        onDoubleTap: () => _openImage(index),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: isSelected 
-                                  ? config.mainColor
-                                  : Colors.transparent,
-                              width: 4,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.file(
-                              File(currentImages[index]),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              if (actionList[5].$1 == true)
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: IconButton(
-                      onPressed: _nextPage,
-                      icon: config.nextIcon(
-                        width: 96,
-                        height: 96,
-                        colorFilter:
-                            ColorFilter.mode(selectedIndex == 5 ? config.mainColor : config.accentColor, BlendMode.srcIn),
-                      ),
-                    ),
-                  ),
-                ),
-
-              Positioned(
-                top: 0,
-                right: 0,
-                child: IconButton(
-                  onPressed: _closeScreen,
-                  icon: config.closeIcon(
-                    width: 96,
-                    height: 96,
-                    colorFilter:
-                        ColorFilter.mode(selectedIndex == 6 ? config.mainColor : config.accentColor, BlendMode.srcIn),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+    return PagedGridScreen(
+      totalItemCount: allImages.length,
+      backgroundBuilder: (config) => config.gallery(
+        width: double.infinity,
+        height: double.infinity,
+        fit: BoxFit.cover,
       ),
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      itemContentBuilder: (config, index) => Image.file(
+        File(allImages[index]),
+        fit: BoxFit.cover,
       ),
-      error: (error, stack) => Scaffold(
-        body: Center(child: Text('Error loading config: $error')),
-      ),
+      onItemSelected: _openImage,
+      onItemDoubleTap: _openImage,
     );
   }
 }
