@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterbooth/models/extensions/app_config_colors.dart';
-import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
 
 class CountdownAndCaptureScreen extends ConsumerStatefulWidget {
@@ -61,7 +61,7 @@ class _CountdownAndCaptureScreenState extends ConsumerState<CountdownAndCaptureS
             break;
           default:
             background = config.capture();
-            text = config.captureText;
+            text = config.texts.captureText;
         }
 
         return Scaffold(
@@ -73,7 +73,7 @@ class _CountdownAndCaptureScreenState extends ConsumerState<CountdownAndCaptureS
                 child: Text(
                   text,
                   style: TextStyle(
-                    fontFamily: config.fontFamilyName,
+                    fontFamily: config.texts.fontFamilyName,
                     fontSize: 100,
                     fontWeight: FontWeight.bold,
                     color: config.textColor,

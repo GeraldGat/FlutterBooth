@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterbooth/models/extensions/app_config_colors.dart';
-import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'package:flutterbooth/models/print_result.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/services/print_service.dart';

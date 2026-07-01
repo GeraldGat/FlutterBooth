@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterbooth/exceptions/gphoto2_exception.dart';
-import 'package:flutterbooth/models/extensions/app_config_colors.dart';
-import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'package:flutterbooth/models/four_collage.dart';
 import 'package:flutterbooth/models/two_collage.dart';
 import 'package:flutterbooth/models/two_plus_one_collage.dart';
@@ -88,7 +89,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     fit: BoxFit.contain,
                   ),
                   Text(
-                    config.homeText,
+                    config.settings.homeText,
                     style: TextStyle(
                       fontSize: 40,
                       color: config.textColor,
@@ -108,7 +109,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   children: [
                     IconButton(
                       onPressed: () async {
-                        final captureService = CaptureService(config.fileSavePath, config.gphotoPort);
+                        final captureService = CaptureService(config.settings.fileSavePath, config.settings.gphotoPort);
                         if (!context.mounted) return;
                         Navigator.push(
                           context,
@@ -166,7 +167,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) => GalleryScreen(
-                              imageFolder: config.fileSavePath,
+                              imageFolder: config.settings.fileSavePath,
                             ),
                           ),
                         );

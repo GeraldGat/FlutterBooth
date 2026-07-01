@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutterbooth/models/app_config.dart';
+import 'package:flutterbooth/models/config/app_config.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterbooth/models/extensions/app_config_colors.dart';
-import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -50,9 +51,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _saveConfig() async {
     final toSave = _config.copyWith(
-      adminPassword: _config.adminPassword?.isEmpty ?? true
+      settings: _config.settings.copyWith(
+        adminPassword: _config.settings.adminPassword?.isEmpty ?? true
           ? ""
-          : sha256.convert(utf8.encode(_config.adminPassword ?? "")).toString(),
+          : sha256.convert(utf8.encode(_config.settings.adminPassword ?? "")).toString(),
+      )
     );
 
     await ref.read(configProvider.notifier).save(toSave);
@@ -266,21 +269,45 @@ Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
-        _buildDirectoryField("File save path", _config.fileSavePath,
-            (v) => setState(() => _config = _config.copyWith(fileSavePath: v))),
-        _buildImageField("Event Logo", _config.eventLogo(width: 80, height: 80), _config.eventLogoPath,
-            (v) => setState(() => _config = _config.copyWith(eventLogoPath: v))),
-        _buildTextField("Home text", _config.homeText,
-            (v) => setState(() => _config = _config.copyWith(homeText: v))),
-        _buildColorField("Main color", _config.mainColor, _config.mainColorHex,
-            (v) => setState(() => _config = _config.copyWith(mainColorHex: v))),
-        _buildColorField("Accent color", _config.accentColor, _config.accentColorHex,
-            (v) => setState(() => _config = _config.copyWith(accentColorHex: v))),
-        _buildTextField("Admin panel password", "",
-            (v) => setState(() => _config = _config.copyWith(adminPassword: v)),
-            obscure: true),
-        _buildTextField("Gphoto2 port", _config.gphotoPort ?? "",
-            (v) => setState(() => _config = _config.copyWith(gphotoPort: v))),
+        _buildDirectoryField(
+          "File save path",
+          _config.settings.fileSavePath,
+          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(fileSavePath: v))),
+        ),
+        _buildImageField(
+          "Event Logo",
+          _config.eventLogo(width: 80, height: 80),
+          _config.settings.eventLogoPath,
+          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(eventLogoPath: v))),
+        ),
+        _buildTextField(
+          "Home text",
+          _config.settings.homeText,
+          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(homeText: v))),
+        ),  
+        _buildColorField(
+          "Main color",
+          _config.mainColor,
+          _config.settings.mainColorHex,
+          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(mainColorHex: v))),
+        ),
+        _buildColorField(
+          "Accent color",
+          _config.accentColor,
+          _config.settings.accentColorHex,
+          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(accentColorHex: v))),
+        ),
+        _buildTextField(
+          "Admin panel password",
+          "",
+          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(adminPassword: v))),
+          obscure: true
+        ),
+        _buildTextField(
+          "Gphoto2 port",
+          _config.settings.gphotoPort ?? "",
+          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(gphotoPort: v))),
+        ),
       ],
     );
   }
@@ -289,22 +316,51 @@ Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
-        _buildImageField("Main wallpaper", _config.mainWallpaper(width: 80, height: 80), _config.mainWallpaperPath,
-            (v) => setState(() => _config = _config.copyWith(mainWallpaperPath: v))),
-        _buildImageField("Countdown 3", _config.countdown3(width: 80, height: 80), _config.countdown3Path,
-            (v) => setState(() => _config = _config.copyWith(countdown3Path: v))),
-        _buildImageField("Countdown 2", _config.countdown2(width: 80, height: 80), _config.countdown2Path,
-            (v) => setState(() => _config = _config.copyWith(countdown2Path: v))),
-        _buildImageField("Countdown 1", _config.countdown1(width: 80, height: 80), _config.countdown1Path,
-            (v) => setState(() => _config = _config.copyWith(countdown1Path: v))),
-        _buildImageField("Capture", _config.capture(width: 80, height: 80), _config.capturePath,
-            (v) => setState(() => _config = _config.copyWith(capturePath: v))),
-        _buildImageField("Result", _config.result(width: 80, height: 80), _config.resultPath,
-            (v) => setState(() => _config = _config.copyWith(resultPath: v))),
-        _buildImageField("Gallery", _config.gallery(width: 80, height: 80), _config.galleryPath,
-            (v) => setState(() => _config = _config.copyWith(galleryPath: v))),
-        _buildImageField("Collage", _config.collage(width: 80, height: 80), _config.collagePath,
-            (v) => setState(() => _config = _config.copyWith(collagePath: v))),
+        _buildImageField(
+          "Main wallpaper",
+          _config.mainWallpaper(width: 80, height: 80),
+          _config.wallpaper.mainWallpaperPath,
+          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(mainWallpaperPath: v))),
+        ),
+        _buildImageField(
+          "Countdown 3",
+          _config.countdown3(width: 80, height: 80),
+          _config.wallpaper.countdown3Path,
+          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(countdown3Path: v))),
+        ),
+        _buildImageField(
+          "Countdown 2",
+          _config.countdown2(width: 80, height: 80),
+          _config.wallpaper.countdown2Path,
+          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(countdown2Path: v))),
+        ),
+        _buildImageField(
+          "Countdown 1",
+          _config.countdown1(width: 80, height: 80),
+          _config.wallpaper.countdown1Path,
+          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(countdown1Path: v))),
+        ),
+        _buildImageField(
+          "Capture",
+          _config.capture(width: 80, height: 80),
+          _config.wallpaper.capturePath,
+          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(capturePath: v))),
+        ),
+        _buildImageField("Result",
+        _config.result(width: 80, height: 80),
+        _config.wallpaper.resultPath,
+          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(resultPath: v))),
+        ),
+        _buildImageField("Gallery",
+        _config.gallery(width: 80, height: 80),
+        _config.wallpaper.galleryPath,
+          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(galleryPath: v))),
+        ),
+        _buildImageField("Collage",
+        _config.collage(width: 80, height: 80),
+        _config.wallpaper.collagePath,
+          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(collagePath: v))),
+        ),
       ],
     );
   }
@@ -313,24 +369,60 @@ Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
-        _buildSvgField("Photo", _config.photoIcon(width: 40, height: 40), _config.photoIconPath,
-            (v) => setState(() => _config = _config.copyWith(photoIconPath: v))),
-        _buildSvgField("Gallery", _config.galleryIcon(width: 40, height: 40), _config.galleryIconPath,
-            (v) => setState(() => _config = _config.copyWith(galleryIconPath: v))),
-        _buildSvgField("Collage", _config.collageIcon(width: 40, height: 40), _config.collageIconPath,
-            (v) => setState(() => _config = _config.copyWith(collageIconPath: v))),
-        _buildSvgField("Back", _config.backIcon(width: 40, height: 40), _config.backIconPath,
-            (v) => setState(() => _config = _config.copyWith(backIconPath: v))),
-        _buildSvgField("Print", _config.printIcon(width: 40, height: 40), _config.printIconPath,
-            (v) => setState(() => _config = _config.copyWith(printIconPath: v))),
-        _buildSvgField("Remove", _config.removeIcon(width: 40, height: 40), _config.removeIconPath,
-            (v) => setState(() => _config = _config.copyWith(removeIconPath: v))),
-        _buildSvgField("Close", _config.closeIcon(width: 40, height: 40), _config.closeIconPath,
-            (v) => setState(() => _config = _config.copyWith(closeIconPath: v))),
-        _buildSvgField("Previous", _config.prevIcon(width: 40, height: 40), _config.prevIconPath,
-            (v) => setState(() => _config = _config.copyWith(prevIconPath: v))),
-        _buildSvgField("Next", _config.nextIcon(width: 40, height: 40), _config.nextIconPath,
-            (v) => setState(() => _config = _config.copyWith(nextIconPath: v))),
+        _buildSvgField(
+          "Photo",
+          _config.photoIcon(width: 40, height: 40),
+          _config.icons.photoIconPath,
+          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(photoIconPath: v))),
+        ),
+        _buildSvgField(
+          "Gallery",
+          _config.galleryIcon(width: 40, height: 40),
+          _config.icons.galleryIconPath,
+          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(galleryIconPath: v))),
+        ),
+        _buildSvgField(
+          "Collage",
+          _config.collageIcon(width: 40, height: 40),
+          _config.icons.collageIconPath,
+          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(collageIconPath: v))),
+        ),
+        _buildSvgField(
+          "Back",
+          _config.backIcon(width: 40, height: 40),
+          _config.icons.backIconPath,
+          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(backIconPath: v))),
+        ),
+        _buildSvgField(
+          "Print",
+          _config.printIcon(width: 40, height: 40),
+          _config.icons.printIconPath,
+          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(printIconPath: v))),
+        ),
+        _buildSvgField(
+          "Remove",
+          _config.removeIcon(width: 40, height: 40),
+          _config.icons.removeIconPath,
+          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(removeIconPath: v))),
+        ),
+        _buildSvgField(
+          "Close",
+          _config.closeIcon(width: 40, height: 40),
+          _config.icons.closeIconPath,
+          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(closeIconPath: v))),
+        ),
+        _buildSvgField(
+          "Previous",
+          _config.prevIcon(width: 40, height: 40),
+          _config.icons.prevIconPath,
+          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(prevIconPath: v))),
+        ),
+        _buildSvgField(
+          "Next",
+          _config.nextIcon(width: 40, height: 40),
+          _config.icons.nextIconPath,
+          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(nextIconPath: v))),
+        ),
       ],
     );
   }
@@ -339,12 +431,22 @@ Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
-        _buildFontFamilyField("Font family", _config.fontFamilyName,
-            (v) => setState(() => _config = _config.copyWith(fontFamilyName: v))),
-        _buildColorField("Text color", _config.textColor, _config.textColorHex,
-            (v) => setState(() => _config = _config.copyWith(textColorHex: v))),
-        _buildTextField("Capture text", _config.captureText,
-            (v) => setState(() => _config = _config.copyWith(captureText: v))),
+        _buildFontFamilyField(
+          "Font family",
+          _config.texts.fontFamilyName,
+          (v) => setState(() => _config = _config.copyWith(texts: _config.texts.copyWith(fontFamilyName: v))),
+        ),
+        _buildColorField(
+          "Text color",
+          _config.textColor,
+          _config.texts.textColorHex,
+          (v) => setState(() => _config = _config.copyWith(texts: _config.texts.copyWith(textColorHex: v))),
+        ),
+        _buildTextField(
+          "Capture text",
+          _config.texts.captureText,
+          (v) => setState(() => _config = _config.copyWith(texts: _config.texts.copyWith(captureText: v))),
+        ),
       ],
     );
   }
@@ -353,14 +455,26 @@ Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
-        _buildShortcutField("Open Settings", _config.shortcutSettingsLogicalKeyId,
-            (v) => setState(() => _config = _config.copyWith(shortcutSettingsLogicalKeyId: v))),
-        _buildShortcutField("Previous", _config.shortcutPrevLogicalKeyId,
-            (v) => setState(() => _config = _config.copyWith(shortcutPrevLogicalKeyId: v))),
-        _buildShortcutField("Next", _config.shortcutNextLogicalKeyId,
-            (v) => setState(() => _config = _config.copyWith(shortcutNextLogicalKeyId: v))),
-        _buildShortcutField("Enter", _config.shortcutEnterLogicalKeyId,
-            (v) => setState(() => _config = _config.copyWith(shortcutEnterLogicalKeyId: v))),
+        _buildShortcutField(
+          "Open Settings",
+          _config.shortcuts.settings,
+          (v) => setState(() => _config = _config.copyWith(shortcuts: _config.shortcuts.copyWith(settings: v))),
+        ),
+        _buildShortcutField(
+          "Previous",
+          _config.shortcuts.prev,
+          (v) => setState(() => _config = _config.copyWith(shortcuts: _config.shortcuts.copyWith(prev: v))),
+        ),
+        _buildShortcutField(
+          "Next",
+          _config.shortcuts.next,
+          (v) => setState(() => _config = _config.copyWith(shortcuts: _config.shortcuts.copyWith(next: v))),
+        ),
+        _buildShortcutField(
+          "Enter",
+          _config.shortcuts.enter,
+          (v) => setState(() => _config = _config.copyWith(shortcuts: _config.shortcuts.copyWith(enter: v))),
+        ),
       ],
     );
   }

@@ -1,7 +1,7 @@
+import 'package:flutterbooth/models/config/app_config.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutterbooth/models/app_config.dart';
 
 class ConfigService {
   static const String _fileName = "flutterbooth_config.json";

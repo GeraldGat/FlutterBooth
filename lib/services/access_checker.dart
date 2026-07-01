@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterbooth/models/app_config.dart';
+import 'package:flutterbooth/models/config/app_config.dart';
 
 class AccessChecker {
   static Future<bool> checkAdminAccess(BuildContext context, AppConfig config) async {
-    if (config.adminPassword?.isEmpty ?? true) return true;
+    if (config.settings.adminPassword?.isEmpty ?? true) return true;
 
     final controller = TextEditingController();
     final ok = await showDialog<bool>(
@@ -26,7 +26,7 @@ class AccessChecker {
             child: const Text("OK"),
             onPressed: () {
               final inputHash = sha256.convert(utf8.encode(controller.text)).toString();
-              Navigator.pop(context, inputHash == config.adminPassword);
+              Navigator.pop(context, inputHash == config.settings.adminPassword);
             },
           ),
         ],

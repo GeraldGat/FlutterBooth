@@ -1,4 +1,4 @@
-import 'package:flutterbooth/models/app_config.dart';
+import 'package:flutterbooth/models/config/app_config.dart';
 import 'package:flutterbooth/services/config_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

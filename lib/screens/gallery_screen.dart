@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'dart:io';
-
-import 'package:flutterbooth/models/extensions/app_config_colors.dart';
-import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';

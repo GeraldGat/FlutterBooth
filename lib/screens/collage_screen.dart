@@ -5,8 +5,9 @@ import 'package:flutterbooth/exceptions/gphoto2_exception.dart';
 import 'dart:io';
 
 import 'package:flutterbooth/models/collage.dart';
-import 'package:flutterbooth/models/extensions/app_config_colors.dart';
-import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.dart';
+import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
@@ -95,7 +96,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
 
   void _makeCollage(Collage collage) async {
     final tempDir = await getTemporaryDirectory();
-    final captureService = CaptureService(tempDir.path, ref.read(configProvider).requireValue.gphotoPort);
+    final captureService = CaptureService(tempDir.path, ref.read(configProvider).requireValue.settings.gphotoPort);
     final List<String> capturedImages = [];
 
     for (int i = 0; i < collage.imageCount; i++) {
@@ -134,7 +135,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
       }
     }
 
-    final outputPath = "${ref.read(configProvider).requireValue.fileSavePath}/collage_${DateTime.now().millisecondsSinceEpoch}.jpg";
+    final outputPath = "${ref.read(configProvider).requireValue.settings.fileSavePath}/collage_${DateTime.now().millisecondsSinceEpoch}.jpg";
 
     try {
       collage.buildCollage(capturedImages, outputPath);

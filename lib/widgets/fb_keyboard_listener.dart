@@ -39,10 +39,10 @@ class FbKeyboardListener extends ConsumerWidget {
     return asyncConfig.when(
       data: (config) => Shortcuts(
         shortcuts: <ShortcutActivator, Intent>{
-          SingleActivator(LogicalKeyboardKey(config.shortcutPrevLogicalKeyId)): const NavigatePreviousIntent(),
-          SingleActivator(LogicalKeyboardKey(config.shortcutNextLogicalKeyId)): const NavigateNextIntent(),
-          SingleActivator(LogicalKeyboardKey(config.shortcutEnterLogicalKeyId)): const ConfirmIntent(),
-          SingleActivator(LogicalKeyboardKey(config.shortcutSettingsLogicalKeyId)): const SettingsIntent(),
+          SingleActivator(LogicalKeyboardKey(config.shortcuts.prev)): const NavigatePreviousIntent(),
+          SingleActivator(LogicalKeyboardKey(config.shortcuts.next)): const NavigateNextIntent(),
+          SingleActivator(LogicalKeyboardKey(config.shortcuts.enter)): const ConfirmIntent(),
+          SingleActivator(LogicalKeyboardKey(config.shortcuts.settings)): const SettingsIntent(),
           SingleActivator(LogicalKeyboardKey.f11): const FullscreenIntent(),
           SingleActivator(LogicalKeyboardKey.escape): const ExitFullscreenIntent(),
         },
