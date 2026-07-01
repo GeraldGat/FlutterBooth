@@ -44,7 +44,6 @@ class PrintOptions {
   // Printer name (null = default printer).
   final String? printerName;
   final int copies;
-  final int dpi;
 
   final PdfColor backgroundColor;
   
@@ -56,6 +55,5 @@ class PrintOptions {
     this.copies = 1,
     this.imageFit = pw.BoxFit.cover,
     this.backgroundColor = PdfColors.white,
-    this.dpi = 300,
   }) : assert(copies >= 1, 'Copies parameter should be at least 1.');
 }

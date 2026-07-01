@@ -7,22 +7,23 @@ class ConfigService {
   static const String _fileName = "flutterbooth_config.json";
 
   Future<File> _getConfigFile() async {
-    final dir = await getApplicationCacheDirectory();
+    final dir = await getApplicationSupportDirectory();
     return File("${dir.path}/$_fileName");
   }
 
-  Future<AppConfig?> loadConfig() async {
+  Future<AppConfig> loadConfig() async {
     final file = await _getConfigFile();
-    if (await file.exists()) {
-      final content = await file.readAsString();
-      final data = jsonDecode(content);
-      return AppConfig.fromJson(data);
-    }
-    return null;
+
+    if (!await file.exists()) return AppConfig();
+
+    final content = await file.readAsString();
+    final data = jsonDecode(content);
+
+    return AppConfig.fromJson(data);
   }
 
   Future<AppConfig> getConfig() async {
-    return await loadConfig() ?? AppConfig();
+    return await loadConfig();
   }
 
   Future<void> saveConfig(AppConfig config) async {

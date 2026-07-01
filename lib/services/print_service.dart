@@ -155,7 +155,7 @@ class PrintService {
   ) async {
     final info = await Printing.info();
     if (!info.canPrint) {
-      throw const PrintServiceException(
+      throw PrintServiceException(
         "Printing is not supported on this platform.",
       );
     }

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutterbooth/exceptions/collage_exception.dart';
 import 'package:image/image.dart' as img;
 
 import 'package:flutterbooth/models/collage.dart';
@@ -11,18 +12,25 @@ class TwoPlusOneCollage extends Collage {
   String get thumbnailAsset => 'assets/images/collage_thumbnails/two_plus_one_collage.png';
 
   @override
-  bool buildCollage(List<String> images, String outputPath) {
+  void buildCollage(List<String> images, String outputPath) {
     if (images.length != imageCount) {
-      return false;
+      throw CollageException(
+        "Invalid number of images for collage",
+        details: "Expected $imageCount but got ${images.length}"
+      );
     }
 
     try {
       const collageFinalWidth = 3000;
       const collageFinalHeight = 2000;
 
-      final image1 = img.decodeImage(File(images[0]).readAsBytesSync())!;
-      final image2 = img.decodeImage(File(images[1]).readAsBytesSync())!;
-      final image3 = img.decodeImage(File(images[2]).readAsBytesSync())!;
+      final image1 = img.decodeImage(File(images[0]).readAsBytesSync());
+      final image2 = img.decodeImage(File(images[1]).readAsBytesSync());
+      final image3 = img.decodeImage(File(images[2]).readAsBytesSync());
+
+      if (image1 == null || image2 == null || image3 == null) {
+        throw CollageException("Failed to decode one or more images");
+      }
 
       final rotated2 = img.copyRotate(image2, angle: 270);
       final rotated3 = img.copyRotate(image3, angle: 270);
@@ -39,9 +47,12 @@ class TwoPlusOneCollage extends Collage {
 
       File(outputPath).writeAsBytesSync(img.encodeJpg(collage, quality: 100));
     } catch (e) {
-      return false;
-    }
+      if (e is CollageException) rethrow;
 
-    return true;
+      throw CollageException(
+        "Unexpected error while building collage",
+        details: e.toString(),
+      );
+    }
   }
 }

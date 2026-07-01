@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterbooth/exceptions/collage_exception.dart';
+import 'package:flutterbooth/exceptions/gphoto2_exception.dart';
 import 'dart:io';
 
 import 'package:flutterbooth/models/collage.dart';
@@ -103,14 +105,16 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
           MaterialPageRoute(
             builder: (_) => CountdownAndCaptureScreen(
               onCapture: () async {
-                final path = await captureService.capture();
+                try {
+                  final path = await captureService.capture();
 
-                if (mounted) {
-                  if (path != null) {
-                    Navigator.pop(context, path);
-                  } else {
-                    Navigator.pop(context, false);
-                  }
+                  if(!mounted) return;
+
+                  Navigator.pop(context, path);
+                } on GPhoto2Exception {
+                  if(!mounted) return;
+
+                  Navigator.pop(context, false);
                 }
               },
             ),
@@ -131,15 +135,26 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
     }
 
     final outputPath = "${ref.read(configProvider).requireValue.fileSavePath}/collage_${DateTime.now().millisecondsSinceEpoch}.jpg";
-    final success = collage.buildCollage(capturedImages, outputPath);
 
-    if (success && mounted) {
+    try {
+      collage.buildCollage(capturedImages, outputPath);
+
+      if(!mounted) return;
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => ResultScreen(
             image: Image.file(File(outputPath)),
           ),
+        ),
+      );
+    } on CollageException catch (e) {
+      if(!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.message),
         ),
       );
     }
@@ -223,8 +238,8 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.file(
-                              File(currentCollages[index].thumbnailAsset),
+                            child: Image.asset(
+                              currentCollages[index].thumbnailAsset,
                               fit: BoxFit.cover,
                             ),
                           ),

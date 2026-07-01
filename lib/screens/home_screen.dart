@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterbooth/exceptions/gphoto2_exception.dart';
 import 'package:flutterbooth/models/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/extensions/app_config_widgets.dart';
 import 'package:flutterbooth/models/four_collage.dart';
@@ -16,7 +17,7 @@ import 'package:flutterbooth/screens/result_screen.dart';
 import 'package:flutterbooth/screens/settings_screen.dart';
 import 'package:flutterbooth/services/capture_service.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
-import 'package:flutterbooth/widgets/rotationg_menu.dart';
+import 'package:flutterbooth/widgets/rotating_menu.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -114,28 +115,38 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           MaterialPageRoute(
                             builder: (_) => CountdownAndCaptureScreen(
                               onCapture: () async {
-                                final path = await captureService.capture();
+                                void showCaptureError(BuildContext context) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("An error occured while capturing image.")),
+                                  );
+                                  Navigator.pop(context);
+                                }
 
-                                if (path != null && File(path).existsSync()) {
-                                  final imageWidget = Image.file(File(path));
+                                try {
+                                  final path = await captureService.capture();
 
-                                  if (context.mounted) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => ResultScreen(
-                                          image: imageWidget,
-                                        ),
+                                  if(!context.mounted) return;
+
+                                  final imageFile = File(path);
+
+                                  if (imageFile.existsSync()) {
+                                    showCaptureError(context);
+                                    return;
+                                  }
+
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ResultScreen(
+                                        image: Image.file(imageFile),
                                       ),
-                                    );
-                                  }
-                                } else {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("An error occured while capturing image.")),
-                                    );
-                                    Navigator.pop(context);
-                                  }
+                                    ),
+                                  );
+                                } on GPhoto2Exception {
+                                  if(!context.mounted) return;
+
+                                  showCaptureError(context);
+                                  return;
                                 }
                               },
                             ),

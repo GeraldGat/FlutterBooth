@@ -6,7 +6,7 @@ import 'package:flutterbooth/models/print_result.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/services/print_service.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
-import 'package:flutterbooth/widgets/rotationg_menu.dart';
+import 'package:flutterbooth/widgets/rotating_menu.dart';
 
 enum ResultScreenReturn {
   back,
@@ -25,11 +25,6 @@ class ResultScreen extends ConsumerStatefulWidget {
 
 class _ResultScreenState extends ConsumerState<ResultScreen> {
   final GlobalKey<RotatingMenuState> menuKey = GlobalKey<RotatingMenuState>();
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   void _handlePrev() {
     menuKey.currentState?.movePrevious();

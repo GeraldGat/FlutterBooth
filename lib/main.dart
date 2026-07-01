@@ -3,7 +3,7 @@ import 'package:flutterbooth/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_listener.dart';
 
-void main() async {
+void main() {
   runApp(const ProviderScope(child: App()));
 }
 

@@ -276,7 +276,7 @@ Widget build(BuildContext context) {
             (v) => setState(() => _config = _config.copyWith(mainColorHex: v))),
         _buildColorField("Accent color", _config.accentColor, _config.accentColorHex,
             (v) => setState(() => _config = _config.copyWith(accentColorHex: v))),
-        _buildTextField("Admin panel password", _config.adminPassword ?? "",
+        _buildTextField("Admin panel password", "",
             (v) => setState(() => _config = _config.copyWith(adminPassword: v)),
             obscure: true),
         _buildTextField("Gphoto2 port", _config.gphotoPort ?? "",

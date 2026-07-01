@@ -17,7 +17,7 @@ class AccessCheckerService {
   Future<bool> checkAdminAccess(BuildContext context) async {
     final configAsync = ref.read(configProvider);
 
-    if(configAsync.value == null) {
+    if(configAsync.hasValue == false || configAsync.value == null) {
       return false;
     }
 

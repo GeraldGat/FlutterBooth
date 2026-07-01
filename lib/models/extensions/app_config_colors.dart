@@ -8,7 +8,9 @@ extension AppConfigColors on AppConfig {
 
   Color get accentColor {
     return Color(int.parse("0xFF$accentColorHex"));
-  }Color get textColor {
+  } 
+  
+  Color get textColor {
     return Color(int.parse("0xFF$textColorHex"));
   }
 }
