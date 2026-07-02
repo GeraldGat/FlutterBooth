@@ -22,15 +22,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   int _currentIndex = 0;
-  List<String> fonts = [];
-  late AppConfig _config;
-
-  @override
-  void initState() {
-    super.initState();
-    fonts = GoogleFonts.asMap().keys.toList()..sort();
-    _config = ref.read(configProvider).requireValue;
-  }
+  AppConfig? _config;
 
   Future<void> _pickFile(Function(String) onSelected, {List<String>? allowedExtensions}) async {
     final result = await FilePicker.platform.pickFiles(
@@ -50,11 +42,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _saveConfig() async {
-    final toSave = _config.copyWith(
-      settings: _config.settings.copyWith(
-        adminPassword: _config.settings.adminPassword?.isEmpty ?? true
+    final config = _config!;
+    final toSave = config.copyWith(
+      settings: config.settings.copyWith(
+        adminPassword: config.settings.adminPassword?.isEmpty ?? true
           ? ""
-          : sha256.convert(utf8.encode(_config.settings.adminPassword ?? "")).toString(),
+          : sha256.convert(utf8.encode(config.settings.adminPassword ?? "")).toString(),
       )
     );
 
@@ -77,7 +70,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Widget _buildFontFamilyField(String label, String value, Function(String) onChanged) {
+  Widget _buildFontFamilyField(String label, String value, Function(String) onChanged, List<String> fonts) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       child: DropdownButtonFormField<String>(
@@ -227,253 +220,273 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
 @override
 Widget build(BuildContext context) {
-  final tabs = ["Settings", "Wallpapers", "Icons", "Texts", "Shortcuts"];
+  final asyncConfig = ref.watch(configProvider);
 
-  return DefaultTabController(
-    length: tabs.length,
-    initialIndex: _currentIndex,
-    child: Scaffold(
-      appBar: AppBar(
-        title: const Text("Configuration"),
-        bottom: TabBar(
-          labelColor: Colors.black,
-          tabs: [for (final t in tabs) Tab(text: t)],
-          onTap: (i) => setState(() => _currentIndex = i),
+  return asyncConfig.when(
+    data: (config) {
+      _config ??= config;
+      final tabs = ["Settings", "Wallpapers", "Icons", "Texts", "Shortcuts"];
+      final fonts = GoogleFonts.asMap().keys.toList()..sort();
+
+      return DefaultTabController(
+        length: tabs.length,
+        initialIndex: _currentIndex,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Configuration"),
+            bottom: TabBar(
+              labelColor: Colors.black,
+              tabs: [for (final t in tabs) Tab(text: t)],
+              onTap: (i) => setState(() => _currentIndex = i),
+            ),
+          ),
+          body: Form(
+            key: _formKey,
+            child: IndexedStack(
+              index: _currentIndex,
+              children: [
+                _buildSettingsTab(),
+                _buildWallpapersTab(),
+                _buildIconsTab(),
+                _buildTextsTab(fonts),
+                _buildShortcutsTab(),
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: _saveConfig,
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Color(0xFFF0F0F0),
+            child: const Icon(Icons.save),
+          ),
         ),
-      ),
-      body: Form(
-        key: _formKey,
-        child: IndexedStack(
-          index: _currentIndex,
-          children: [
-            _buildSettingsTab(),
-            _buildWallpapersTab(),
-            _buildIconsTab(),
-            _buildTextsTab(),
-            _buildShortcutsTab(),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _saveConfig,
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Color(0xFFF0F0F0),
-        child: const Icon(Icons.save),
-      ),
+      );
+    },
+    loading: () => const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
+    ),
+    error: (error, _) => Scaffold(
+      body: Center(child: Text('Error loading config: $error')),
     ),
   );
 }
 
 
   Widget _buildSettingsTab() {
+    final config = _config!;
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
         _buildDirectoryField(
           "File save path",
-          _config.settings.fileSavePath,
-          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(fileSavePath: v))),
+          config.settings.fileSavePath,
+          (v) => setState(() => _config = _config!.copyWith(settings: _config!.settings.copyWith(fileSavePath: v))),
         ),
         _buildImageField(
           "Event Logo",
-          _config.eventLogo(width: 80, height: 80),
-          _config.settings.eventLogoPath,
-          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(eventLogoPath: v))),
+          config.eventLogo(width: 80, height: 80),
+          config.settings.eventLogoPath,
+          (v) => setState(() => _config = _config!.copyWith(settings: _config!.settings.copyWith(eventLogoPath: v))),
         ),
         _buildTextField(
           "Home text",
-          _config.settings.homeText,
-          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(homeText: v))),
+          config.settings.homeText,
+          (v) => setState(() => _config = _config!.copyWith(settings: _config!.settings.copyWith(homeText: v))),
         ),  
         _buildColorField(
           "Main color",
-          _config.mainColor,
-          _config.settings.mainColorHex,
-          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(mainColorHex: v))),
+          config.mainColor,
+          config.settings.mainColorHex,
+          (v) => setState(() => _config = _config!.copyWith(settings: _config!.settings.copyWith(mainColorHex: v))),
         ),
         _buildColorField(
           "Accent color",
-          _config.accentColor,
-          _config.settings.accentColorHex,
-          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(accentColorHex: v))),
+          config.accentColor,
+          config.settings.accentColorHex,
+          (v) => setState(() => _config = _config!.copyWith(settings: _config!.settings.copyWith(accentColorHex: v))),
         ),
         _buildTextField(
           "Admin panel password",
           "",
-          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(adminPassword: v))),
+          (v) => setState(() => _config = _config!.copyWith(settings: _config!.settings.copyWith(adminPassword: v))),
           obscure: true
         ),
         _buildTextField(
           "Gphoto2 port",
-          _config.settings.gphotoPort ?? "",
-          (v) => setState(() => _config = _config.copyWith(settings: _config.settings.copyWith(gphotoPort: v))),
+          config.settings.gphotoPort ?? "",
+          (v) => setState(() => _config = _config!.copyWith(settings: _config!.settings.copyWith(gphotoPort: v))),
         ),
       ],
     );
   }
 
   Widget _buildWallpapersTab() {
+    final config = _config!;
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
         _buildImageField(
           "Main wallpaper",
-          _config.mainWallpaper(width: 80, height: 80),
-          _config.wallpaper.mainWallpaperPath,
-          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(mainWallpaperPath: v))),
+          config.mainWallpaper(width: 80, height: 80),
+          config.wallpaper.mainWallpaperPath,
+          (v) => setState(() => _config = _config!.copyWith(wallpaper: _config!.wallpaper.copyWith(mainWallpaperPath: v))),
         ),
         _buildImageField(
           "Countdown 3",
-          _config.countdown3(width: 80, height: 80),
-          _config.wallpaper.countdown3Path,
-          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(countdown3Path: v))),
+          config.countdown3(width: 80, height: 80),
+          config.wallpaper.countdown3Path,
+          (v) => setState(() => _config = _config!.copyWith(wallpaper: _config!.wallpaper.copyWith(countdown3Path: v))),
         ),
         _buildImageField(
           "Countdown 2",
-          _config.countdown2(width: 80, height: 80),
-          _config.wallpaper.countdown2Path,
-          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(countdown2Path: v))),
+          config.countdown2(width: 80, height: 80),
+          config.wallpaper.countdown2Path,
+          (v) => setState(() => _config = _config!.copyWith(wallpaper: _config!.wallpaper.copyWith(countdown2Path: v))),
         ),
         _buildImageField(
           "Countdown 1",
-          _config.countdown1(width: 80, height: 80),
-          _config.wallpaper.countdown1Path,
-          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(countdown1Path: v))),
+          config.countdown1(width: 80, height: 80),
+          config.wallpaper.countdown1Path,
+          (v) => setState(() => _config = _config!.copyWith(wallpaper: _config!.wallpaper.copyWith(countdown1Path: v))),
         ),
         _buildImageField(
           "Capture",
-          _config.capture(width: 80, height: 80),
-          _config.wallpaper.capturePath,
-          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(capturePath: v))),
+          config.capture(width: 80, height: 80),
+          config.wallpaper.capturePath,
+          (v) => setState(() => _config = _config!.copyWith(wallpaper: _config!.wallpaper.copyWith(capturePath: v))),
         ),
         _buildImageField("Result",
-        _config.result(width: 80, height: 80),
-        _config.wallpaper.resultPath,
-          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(resultPath: v))),
+        config.result(width: 80, height: 80),
+        config.wallpaper.resultPath,
+          (v) => setState(() => _config = _config!.copyWith(wallpaper: _config!.wallpaper.copyWith(resultPath: v))),
         ),
         _buildImageField("Gallery",
-        _config.gallery(width: 80, height: 80),
-        _config.wallpaper.galleryPath,
-          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(galleryPath: v))),
+        config.gallery(width: 80, height: 80),
+        config.wallpaper.galleryPath,
+          (v) => setState(() => _config = _config!.copyWith(wallpaper: _config!.wallpaper.copyWith(galleryPath: v))),
         ),
         _buildImageField("Collage",
-        _config.collage(width: 80, height: 80),
-        _config.wallpaper.collagePath,
-          (v) => setState(() => _config = _config.copyWith(wallpaper: _config.wallpaper.copyWith(collagePath: v))),
+        config.collage(width: 80, height: 80),
+        config.wallpaper.collagePath,
+          (v) => setState(() => _config = _config!.copyWith(wallpaper: _config!.wallpaper.copyWith(collagePath: v))),
         ),
       ],
     );
   }
 
   Widget _buildIconsTab() {
+    final config = _config!;
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
         _buildSvgField(
           "Photo",
-          _config.photoIcon(width: 40, height: 40),
-          _config.icons.photoIconPath,
-          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(photoIconPath: v))),
+          config.photoIcon(width: 40, height: 40),
+          config.icons.photoIconPath,
+          (v) => setState(() => _config = _config!.copyWith(icons: _config!.icons.copyWith(photoIconPath: v))),
         ),
         _buildSvgField(
           "Gallery",
-          _config.galleryIcon(width: 40, height: 40),
-          _config.icons.galleryIconPath,
-          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(galleryIconPath: v))),
+          config.galleryIcon(width: 40, height: 40),
+          config.icons.galleryIconPath,
+          (v) => setState(() => _config = _config!.copyWith(icons: _config!.icons.copyWith(galleryIconPath: v))),
         ),
         _buildSvgField(
           "Collage",
-          _config.collageIcon(width: 40, height: 40),
-          _config.icons.collageIconPath,
-          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(collageIconPath: v))),
+          config.collageIcon(width: 40, height: 40),
+          config.icons.collageIconPath,
+          (v) => setState(() => _config = _config!.copyWith(icons: _config!.icons.copyWith(collageIconPath: v))),
         ),
         _buildSvgField(
           "Back",
-          _config.backIcon(width: 40, height: 40),
-          _config.icons.backIconPath,
-          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(backIconPath: v))),
+          config.backIcon(width: 40, height: 40),
+          config.icons.backIconPath,
+          (v) => setState(() => _config = _config!.copyWith(icons: _config!.icons.copyWith(backIconPath: v))),
         ),
         _buildSvgField(
           "Print",
-          _config.printIcon(width: 40, height: 40),
-          _config.icons.printIconPath,
-          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(printIconPath: v))),
+          config.printIcon(width: 40, height: 40),
+          config.icons.printIconPath,
+          (v) => setState(() => _config = _config!.copyWith(icons: _config!.icons.copyWith(printIconPath: v))),
         ),
         _buildSvgField(
           "Remove",
-          _config.removeIcon(width: 40, height: 40),
-          _config.icons.removeIconPath,
-          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(removeIconPath: v))),
+          config.removeIcon(width: 40, height: 40),
+          config.icons.removeIconPath,
+          (v) => setState(() => _config = _config!.copyWith(icons: _config!.icons.copyWith(removeIconPath: v))),
         ),
         _buildSvgField(
           "Close",
-          _config.closeIcon(width: 40, height: 40),
-          _config.icons.closeIconPath,
-          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(closeIconPath: v))),
+          config.closeIcon(width: 40, height: 40),
+          config.icons.closeIconPath,
+          (v) => setState(() => _config = _config!.copyWith(icons: _config!.icons.copyWith(closeIconPath: v))),
         ),
         _buildSvgField(
           "Previous",
-          _config.prevIcon(width: 40, height: 40),
-          _config.icons.prevIconPath,
-          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(prevIconPath: v))),
+          config.prevIcon(width: 40, height: 40),
+          config.icons.prevIconPath,
+          (v) => setState(() => _config = _config!.copyWith(icons: _config!.icons.copyWith(prevIconPath: v))),
         ),
         _buildSvgField(
           "Next",
-          _config.nextIcon(width: 40, height: 40),
-          _config.icons.nextIconPath,
-          (v) => setState(() => _config = _config.copyWith(icons: _config.icons.copyWith(nextIconPath: v))),
+          config.nextIcon(width: 40, height: 40),
+          config.icons.nextIconPath,
+          (v) => setState(() => _config = _config!.copyWith(icons: _config!.icons.copyWith(nextIconPath: v))),
         ),
       ],
     );
   }
 
-  Widget _buildTextsTab() {
+  Widget _buildTextsTab(List<String> fonts) {
+    final config = _config!;
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
         _buildFontFamilyField(
           "Font family",
-          _config.texts.fontFamilyName,
-          (v) => setState(() => _config = _config.copyWith(texts: _config.texts.copyWith(fontFamilyName: v))),
+          config.texts.fontFamilyName,
+          (v) => setState(() => _config = _config!.copyWith(texts: _config!.texts.copyWith(fontFamilyName: v))),
+          fonts,
         ),
         _buildColorField(
           "Text color",
-          _config.textColor,
-          _config.texts.textColorHex,
-          (v) => setState(() => _config = _config.copyWith(texts: _config.texts.copyWith(textColorHex: v))),
+          config.textColor,
+          config.texts.textColorHex,
+          (v) => setState(() => _config = _config!.copyWith(texts: _config!.texts.copyWith(textColorHex: v))),
         ),
         _buildTextField(
           "Capture text",
-          _config.texts.captureText,
-          (v) => setState(() => _config = _config.copyWith(texts: _config.texts.copyWith(captureText: v))),
+          config.texts.captureText,
+          (v) => setState(() => _config = _config!.copyWith(texts: _config!.texts.copyWith(captureText: v))),
         ),
       ],
     );
   }
 
   Widget _buildShortcutsTab() {
+    final config = _config!;
     return ListView(
       padding: const EdgeInsets.all(8),
       children: [
         _buildShortcutField(
           "Open Settings",
-          _config.shortcuts.settings,
-          (v) => setState(() => _config = _config.copyWith(shortcuts: _config.shortcuts.copyWith(settings: v))),
+          config.shortcuts.settings,
+          (v) => setState(() => _config = _config!.copyWith(shortcuts: _config!.shortcuts.copyWith(settings: v))),
         ),
         _buildShortcutField(
           "Previous",
-          _config.shortcuts.prev,
-          (v) => setState(() => _config = _config.copyWith(shortcuts: _config.shortcuts.copyWith(prev: v))),
+          config.shortcuts.prev,
+          (v) => setState(() => _config = _config!.copyWith(shortcuts: _config!.shortcuts.copyWith(prev: v))),
         ),
         _buildShortcutField(
           "Next",
-          _config.shortcuts.next,
-          (v) => setState(() => _config = _config.copyWith(shortcuts: _config.shortcuts.copyWith(next: v))),
+          config.shortcuts.next,
+          (v) => setState(() => _config = _config!.copyWith(shortcuts: _config!.shortcuts.copyWith(next: v))),
         ),
         _buildShortcutField(
           "Enter",
-          _config.shortcuts.enter,
-          (v) => setState(() => _config = _config.copyWith(shortcuts: _config.shortcuts.copyWith(enter: v))),
+          config.shortcuts.enter,
+          (v) => setState(() => _config = _config!.copyWith(shortcuts: _config!.shortcuts.copyWith(enter: v))),
         ),
       ],
     );
