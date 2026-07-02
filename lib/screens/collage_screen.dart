@@ -68,7 +68,13 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
     final outputPath = "${ref.read(configProvider).requireValue.settings.fileSavePath}/collage_${DateTime.now().millisecondsSinceEpoch}.jpg";
 
     try {
-      collage.buildCollage(capturedImages, outputPath);
+      await buildCollageInIsolate(
+        canvasWidth: collage.canvasWidth,
+        canvasHeight: collage.canvasHeight,
+        layout: collage.layoutItems,
+        imagePaths: capturedImages,
+        outputPath: outputPath,
+      );
 
       if(!mounted) return;
 
