@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutterbooth/providers/config_provider.dart';
 
 class NavigatePreviousIntent extends Intent {
   const NavigatePreviousIntent();
@@ -27,29 +25,25 @@ class ExitFullscreenIntent extends Intent {
   const ExitFullscreenIntent();
 }
 
-class FbKeyboardListener extends ConsumerWidget {
+class FbKeyboardListener extends StatelessWidget {
   final Widget child;
-  
-  const FbKeyboardListener({super.key, required this.child});
-  
+  final Map<ShortcutActivator, Intent> shortcuts;
+
+  const FbKeyboardListener({
+    super.key,
+    required this.child,
+    required this.shortcuts,
+  });
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncConfig = ref.watch(configProvider);
-    
-    return asyncConfig.when(
-      data: (config) => Shortcuts(
-        shortcuts: <ShortcutActivator, Intent>{
-          SingleActivator(LogicalKeyboardKey(config.shortcuts.prev)): const NavigatePreviousIntent(),
-          SingleActivator(LogicalKeyboardKey(config.shortcuts.next)): const NavigateNextIntent(),
-          SingleActivator(LogicalKeyboardKey(config.shortcuts.enter)): const ConfirmIntent(),
-          SingleActivator(LogicalKeyboardKey(config.shortcuts.settings)): const SettingsIntent(),
-          SingleActivator(LogicalKeyboardKey.f11): const FullscreenIntent(),
-          SingleActivator(LogicalKeyboardKey.escape): const ExitFullscreenIntent(),
-        },
-        child: child,
-      ),
-      loading: () => child,
-      error: (_, __) => child,
+  Widget build(BuildContext context) {
+    return Shortcuts(
+      shortcuts: <ShortcutActivator, Intent>{
+        ...shortcuts,
+        SingleActivator(LogicalKeyboardKey.f11): const FullscreenIntent(),
+        SingleActivator(LogicalKeyboardKey.escape): const ExitFullscreenIntent(),
+      },
+      child: child,
     );
   }
 }
