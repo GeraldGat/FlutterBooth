@@ -32,6 +32,7 @@ class AccessChecker {
         ],
       ),
     );
+    controller.dispose();
     return ok ?? false;
   }
 }

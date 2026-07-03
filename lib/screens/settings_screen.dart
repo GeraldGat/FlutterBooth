@@ -89,8 +89,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         children: [
           Expanded(
             child: TextFormField(
+              key: ValueKey(path),
               readOnly: true,
-              controller: TextEditingController(text: path),
+              initialValue: path,
               decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
             ),
           ),
@@ -104,14 +105,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildColorField(String label, Color color, String value, Function(String) onChanged) {
-    final controller = TextEditingController(text: value);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
           Expanded(
             child: TextFormField(
-              controller: controller,
+              key: ValueKey(value),
+              initialValue: value,
               decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
               onChanged: onChanged,
             ),
@@ -137,7 +138,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
               if (picked != null) {
                 final hex = picked.toARGB32().toRadixString(16).toUpperCase();
-                controller.text = hex;
                 onChanged(hex);
                 setState(() {});
               }
@@ -158,8 +158,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(width: 4),
           Expanded(
             child: TextFormField(
+              key: ValueKey(path),
               readOnly: true,
-              controller: TextEditingController(text: path),
+              initialValue: path,
               decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
             ),
           ),
@@ -181,8 +182,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(width: 4),
           Expanded(
             child: TextFormField(
+              key: ValueKey(path),
               readOnly: true,
-              controller: TextEditingController(text: path),
+              initialValue: path,
               decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
             ),
           ),
@@ -196,21 +198,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Widget _buildShortcutField(String label, int keyId, Function(int) onChanged) {
-    final controller = TextEditingController(text: LogicalKeyboardKey(keyId).keyLabel);
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       child: Focus(
         onKeyEvent: (node, event) {
           if (event is KeyDownEvent) {
-            final key = event.logicalKey;
-            controller.text = key.keyLabel;
-            onChanged(key.keyId);
+            onChanged(event.logicalKey.keyId);
+            setState(() {});
             return KeyEventResult.handled;
           }
           return KeyEventResult.ignored;
         },
         child: TextFormField(
-          controller: controller,
+          key: ValueKey(keyId),
+          initialValue: LogicalKeyboardKey(keyId).keyLabel,
           readOnly: true,
           decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
         ),
