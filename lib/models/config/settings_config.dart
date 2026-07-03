@@ -7,6 +7,7 @@ class SettingsConfig implements Config {
   final String mainColorHex;
   final String accentColorHex;
   final String? adminPassword;
+  final String? passwordSalt;
   final String? gphotoPort;
 
   const SettingsConfig({
@@ -16,6 +17,7 @@ class SettingsConfig implements Config {
     this.mainColorHex = "FF4E4E7B",
     this.accentColorHex = "994E4E7B",
     this.adminPassword,
+    this.passwordSalt,
     this.gphotoPort,
   });
 
@@ -27,6 +29,7 @@ class SettingsConfig implements Config {
     String? mainColorHex,
     String? accentColorHex,
     String? adminPassword,
+    String? passwordSalt,
     String? gphotoPort,
   }) {
     return SettingsConfig(
@@ -36,6 +39,7 @@ class SettingsConfig implements Config {
       mainColorHex: mainColorHex ?? this.mainColorHex,
       accentColorHex: accentColorHex ?? this.accentColorHex,
       adminPassword: adminPassword ?? this.adminPassword,
+      passwordSalt: passwordSalt ?? this.passwordSalt,
       gphotoPort: gphotoPort ?? this.gphotoPort,
     );
   }
@@ -47,6 +51,7 @@ class SettingsConfig implements Config {
     mainColorHex: json["mainColorHex"] ?? "FF4E4E7B",
     accentColorHex: json["accentColorHex"] ?? "994E4E7B",
     adminPassword: json["adminPassword"],
+    passwordSalt: json["passwordSalt"],
     gphotoPort: json["gphotoPort"],
   );
 
@@ -58,6 +63,7 @@ class SettingsConfig implements Config {
     "mainColorHex": mainColorHex,
     "accentColorHex": accentColorHex,
     "adminPassword": adminPassword,
+    "passwordSalt": passwordSalt,
     "gphotoPort": gphotoPort,
   };
 }

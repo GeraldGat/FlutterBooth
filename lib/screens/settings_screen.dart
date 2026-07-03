@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -22,7 +23,15 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   int _currentIndex = 0;
+  final _passwordController = TextEditingController();
+  bool _passwordEverModified = false;
   AppConfig? _config;
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _pickFile(Function(String) onSelected, {List<String>? allowedExtensions}) async {
     final result = await FilePicker.platform.pickFiles(
@@ -43,12 +52,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _saveConfig() async {
     final config = _config!;
+
+    final settings = config.settings;
+    String? passwordHash;
+    String? passwordSalt;
+
+    final password = _passwordController.text;
+    if (_passwordEverModified && password.isEmpty) {
+      passwordHash = "";
+      passwordSalt = null;
+    } else if (_passwordEverModified && password.isNotEmpty) {
+      final salt = base64Encode(List<int>.generate(16, (_) => Random.secure().nextInt(256)));
+      passwordHash = sha256.convert(utf8.encode(password + salt)).toString();
+      passwordSalt = salt;
+    } else {
+      passwordHash = settings.adminPassword;
+      passwordSalt = settings.passwordSalt;
+    }
+
     final toSave = config.copyWith(
-      settings: config.settings.copyWith(
-        adminPassword: config.settings.adminPassword?.isEmpty ?? true
-          ? ""
-          : sha256.convert(utf8.encode(config.settings.adminPassword ?? "")).toString(),
-      )
+      settings: settings.copyWith(
+        adminPassword: passwordHash,
+        passwordSalt: passwordSalt,
+      ),
     );
 
     await ref.read(configProvider.notifier).save(toSave);
@@ -66,6 +92,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         obscureText: obscure,
         decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
         onChanged: onChanged,
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    final hasPassword = _config?.settings.adminPassword?.isNotEmpty == true;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: TextFormField(
+        controller: _passwordController,
+        obscureText: true,
+        decoration: InputDecoration(
+          labelText: "Admin panel password",
+          border: const OutlineInputBorder(),
+          helperText: hasPassword
+              ? "Clear the field and save to remove the password"
+              : null,
+        ),
+        onChanged: (_) => _passwordEverModified = true,
       ),
     );
   }
@@ -225,7 +270,12 @@ Widget build(BuildContext context) {
 
   return asyncConfig.when(
     data: (config) {
-      _config ??= config;
+      if (_config == null) {
+        _config = config;
+        if (config.settings.adminPassword?.isNotEmpty == true) {
+          _passwordController.text = "p";
+        }
+      }
       final tabs = ["Settings", "Wallpapers", "Icons", "Texts", "Shortcuts"];
       final fonts = GoogleFonts.asMap().keys.toList()..sort();
 
@@ -306,12 +356,7 @@ Widget build(BuildContext context) {
           config.settings.accentColorHex,
           (v) => setState(() => _config = _config!.copyWith(settings: _config!.settings.copyWith(accentColorHex: v))),
         ),
-        _buildTextField(
-          "Admin panel password",
-          "",
-          (v) => setState(() => _config = _config!.copyWith(settings: _config!.settings.copyWith(adminPassword: v))),
-          obscure: true
-        ),
+        _buildPasswordField(),
         _buildTextField(
           "Gphoto2 port",
           config.settings.gphotoPort ?? "",

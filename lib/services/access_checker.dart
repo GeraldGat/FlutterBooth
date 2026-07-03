@@ -8,6 +8,7 @@ class AccessChecker {
     if (config.settings.adminPassword?.isEmpty ?? true) return true;
 
     final controller = TextEditingController();
+    final salt = config.settings.passwordSalt ?? "";
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -25,7 +26,7 @@ class AccessChecker {
           TextButton(
             child: const Text("OK"),
             onPressed: () {
-              final inputHash = sha256.convert(utf8.encode(controller.text)).toString();
+              final inputHash = sha256.convert(utf8.encode(controller.text + salt)).toString();
               Navigator.pop(context, inputHash == config.settings.adminPassword);
             },
           ),
