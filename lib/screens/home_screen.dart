@@ -39,11 +39,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _handleEnter() {
-    try {
-      (menuKey.currentState?.selected as dynamic).onPressed?.call();
-    } catch (e) {
-      // If no button is selected, ignore
-    }
+    menuKey.currentState?.selectedCallback?.call();
   }
 
   Future<void> _openSettings() async {
@@ -106,8 +102,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: RotatingMenu(
                   key: menuKey,
                   displayedChildren: 3,
-                  children: [
-                    IconButton(
+                  items: [
+                    RotatingMenuItem(
                       onPressed: () async {
                         final captureService = CaptureService(config.settings.fileSavePath, config.settings.gphotoPort);
                         if (!context.mounted) return;
@@ -154,14 +150,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         );
                       },
-                      icon: config.photoIcon(
-                        width: 48,
-                        height: 48,
-                        colorFilter:
-                            ColorFilter.mode(config.mainColor, BlendMode.srcIn),
+                      child: IconButton(
+                        onPressed: null,
+                        icon: config.photoIcon(
+                          width: 48,
+                          height: 48,
+                          colorFilter:
+                              ColorFilter.mode(config.mainColor, BlendMode.srcIn),
+                        ),
                       ),
                     ),
-                    IconButton(
+                    RotatingMenuItem(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -172,14 +171,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         );
                       },
-                      icon: config.galleryIcon(
-                        width: 48,
-                        height: 48,
-                        colorFilter:
-                            ColorFilter.mode(config.mainColor, BlendMode.srcIn),
+                      child: IconButton(
+                        onPressed: null,
+                        icon: config.galleryIcon(
+                          width: 48,
+                          height: 48,
+                          colorFilter:
+                              ColorFilter.mode(config.mainColor, BlendMode.srcIn),
+                        ),
                       ),
                     ),
-                    IconButton(
+                    RotatingMenuItem(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -194,11 +196,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                         );
                       },
-                      icon: config.collageIcon(
-                        width: 48,
-                        height: 48,
-                        colorFilter:
-                            ColorFilter.mode(config.mainColor, BlendMode.srcIn),
+                      child: IconButton(
+                        onPressed: null,
+                        icon: config.collageIcon(
+                          width: 48,
+                          height: 48,
+                          colorFilter:
+                              ColorFilter.mode(config.mainColor, BlendMode.srcIn),
+                        ),
                       ),
                     ),
                   ],

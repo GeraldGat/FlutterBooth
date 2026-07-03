@@ -2,8 +2,18 @@ import 'package:flutter/material.dart';
 
 enum RotatingMenuItemState { hidden, displayed, selected }
 
+class RotatingMenuItem {
+  final Widget child;
+  final VoidCallback? onPressed;
+
+  const RotatingMenuItem({
+    required this.child,
+    this.onPressed,
+  });
+}
+
 class RotatingMenu extends StatefulWidget {
-  final List<Widget> children;
+  final List<RotatingMenuItem> items;
   final int displayedChildren;
   final Widget separator;
   final double defaultScale;
@@ -14,7 +24,7 @@ class RotatingMenu extends StatefulWidget {
 
   const RotatingMenu({
     super.key,
-    required this.children,
+    required this.items,
     int? displayedChildren,
     this.separator = const SizedBox(width: 20),
     this.defaultScale = 1.0,
@@ -22,7 +32,7 @@ class RotatingMenu extends StatefulWidget {
     this.defaultOpacity = 0.6,
     this.selectedOpacity = 1.0,
     this.animationDuration = const Duration(milliseconds: 300),
-  }) : displayedChildren = displayedChildren != null && displayedChildren <= children.length ? displayedChildren : children.length;
+  }) : displayedChildren = displayedChildren != null && displayedChildren <= items.length ? displayedChildren : items.length;
 
   @override
   State<RotatingMenu> createState() => RotatingMenuState();
@@ -31,10 +41,10 @@ class RotatingMenu extends StatefulWidget {
 class RotatingMenuState extends State<RotatingMenu> {
   int selectedIndex = 0;
 
-  Widget get selected => widget.children[selectedIndex];
+  VoidCallback? get selectedCallback => widget.items[selectedIndex].onPressed;
 
   int _getIndexOffset(int offset) {
-    return (selectedIndex + offset + widget.children.length) % widget.children.length;
+    return (selectedIndex + offset + widget.items.length) % widget.items.length;
   }
 
   void movePrevious() {
@@ -51,8 +61,8 @@ class RotatingMenuState extends State<RotatingMenu> {
 
   @override
   Widget build(BuildContext context) {
-    int leftChildren = (widget.children.length - 1) ~/ 2;
-    int rightChildren = widget.children.length - 1 - leftChildren;
+    int leftChildren = (widget.items.length - 1) ~/ 2;
+    int rightChildren = widget.items.length - 1 - leftChildren;
     int leftDisplayedChildren = (widget.displayedChildren - 1) ~/ 2;
     int rightDisplayedChildren = widget.displayedChildren - 1 - leftDisplayedChildren;
 
@@ -91,7 +101,7 @@ class RotatingMenuState extends State<RotatingMenu> {
       child: AnimatedOpacity(
         opacity: opacityByState[menuState]!,
         duration: widget.animationDuration,
-        child: widget.children[index],
+        child: widget.items[index].child,
       ),
     );
   }

@@ -36,11 +36,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   }
 
   void _handleEnter() {
-    try {
-      (menuKey.currentState?.selected as dynamic).onPressed?.call();
-    } catch (e) {
-      // If no button is selected, ignore
-    }
+    menuKey.currentState?.selectedCallback?.call();
   }
 
   @override
@@ -76,23 +72,26 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                   child: RotatingMenu(
                     key: menuKey,
                     displayedChildren: 3,
-                    children: [
-                      IconButton(
+                    items: [
+                      RotatingMenuItem(
                         onPressed: () {
                           if (mounted) {
                             Navigator.pop(context, ResultScreenReturn.back);
                           }
                         },
-                        icon: config.backIcon(
-                          width: 48,
-                          height: 48,
-                          colorFilter: ColorFilter.mode(
-                            config.mainColor,
-                            BlendMode.srcIn,
+                        child: IconButton(
+                          onPressed: null,
+                          icon: config.backIcon(
+                            width: 48,
+                            height: 48,
+                            colorFilter: ColorFilter.mode(
+                              config.mainColor,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ),
                       ),
-                      IconButton(
+                      RotatingMenuItem(
                         onPressed: () async {
                           if (widget.image.image is FileImage) {
                             final file = (widget.image.image as FileImage).file;
@@ -111,16 +110,19 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                             }
                           }
                         },
-                        icon: config.printIcon(
-                          width: 48,
-                          height: 48,
-                          colorFilter: ColorFilter.mode(
-                            config.mainColor,
-                            BlendMode.srcIn,
+                        child: IconButton(
+                          onPressed: null,
+                          icon: config.printIcon(
+                            width: 48,
+                            height: 48,
+                            colorFilter: ColorFilter.mode(
+                              config.mainColor,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ),
                       ),
-                      IconButton(
+                      RotatingMenuItem(
                         onPressed: () {
                           if (widget.image.image is FileImage) {
                             final file = (widget.image.image as FileImage).file;
@@ -132,12 +134,15 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                             }
                           }
                         },
-                        icon: config.removeIcon(
-                          width: 48,
-                          height: 48,
-                          colorFilter: ColorFilter.mode(
-                            config.mainColor,
-                            BlendMode.srcIn,
+                        child: IconButton(
+                          onPressed: null,
+                          icon: config.removeIcon(
+                            width: 48,
+                            height: 48,
+                            colorFilter: ColorFilter.mode(
+                              config.mainColor,
+                              BlendMode.srcIn,
+                            ),
                           ),
                         ),
                       ),
