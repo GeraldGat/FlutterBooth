@@ -70,7 +70,7 @@ class _PagedGridScreenState extends ConsumerState<PagedGridScreen> {
     int nextIndex = selectedIndex;
 
     for (int i = 0; i < actionList.length; i++) {
-      nextIndex = (nextIndex + step + 7) % 7;
+      nextIndex = (nextIndex + step + actionList.length) % actionList.length;
       if (actionList[nextIndex].$1 == true) {
         return nextIndex;
       }
