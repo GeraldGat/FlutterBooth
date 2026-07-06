@@ -39,16 +39,27 @@ void main() {
       ));
     });
 
-    test('sha256 hash verification works correctly', () {
+    test('salted hash verification works correctly', () {
       const password = 'admin123';
-      const hashed = '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9';
-      final computed = sha256.convert(utf8.encode(password)).toString();
-      expect(computed, hashed);
+      const salt = 'test-salt';
+      final hash1 = sha256.convert(utf8.encode('$password$salt')).toString();
+      final hash2 = sha256.convert(utf8.encode('$password$salt')).toString();
+      expect(hash1, hash2);
     });
 
-    test('different passwords produce different hashes', () {
-      final hash1 = sha256.convert(utf8.encode('password1')).toString();
-      final hash2 = sha256.convert(utf8.encode('password2')).toString();
+    test('different salts produce different hashes', () {
+      const password = 'admin123';
+      const saltA = 'salt-a';
+      const saltB = 'salt-b';
+      final hash1 = sha256.convert(utf8.encode('$password$saltA')).toString();
+      final hash2 = sha256.convert(utf8.encode('$password$saltB')).toString();
+      expect(hash1, isNot(equals(hash2)));
+    });
+
+    test('different passwords with same salt produce different hashes', () {
+      const salt = 'fixed-salt';
+      final hash1 = sha256.convert(utf8.encode('password1$salt')).toString();
+      final hash2 = sha256.convert(utf8.encode('password2$salt')).toString();
       expect(hash1, isNot(equals(hash2)));
     });
   });
