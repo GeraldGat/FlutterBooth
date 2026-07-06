@@ -24,20 +24,25 @@ class _GalleryScreenState extends ConsumerState<GalleryScreen> {
     _loadImages();
   }
 
-  void _loadImages() {
+  Future<void> _loadImages() async {
     final directory = Directory(widget.imageFolder);
-    if (directory.existsSync()) {
-      final files = directory.listSync()
-          .where((file) => lookupMimeType(file.path)?.startsWith('image/') == true)
-          .map((file) => file.path)
-          .toList();
+    if (!await directory.exists()) return;
 
-      files.sort((a, b) => File(b).lastModifiedSync().compareTo(File(a).lastModifiedSync()));
-
-      setState(() {
-        allImages = files;
-      });
+    final files = await directory.list().toList();
+    final filesWithDates = <(String, DateTime)>[];
+    for (final entity in files) {
+      if (lookupMimeType(entity.path)?.startsWith('image/') == true) {
+        final modified = await File(entity.path).lastModified();
+        filesWithDates.add((entity.path, modified));
+      }
     }
+
+    filesWithDates.sort((a, b) => b.$2.compareTo(a.$2));
+    final filesWithDatesList = filesWithDates.map((e) => e.$1).toList();
+
+    setState(() {
+      allImages = filesWithDatesList;
+    });
   }
 
   Future<void> _openImage(int index) async {
