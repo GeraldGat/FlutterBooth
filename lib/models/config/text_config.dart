@@ -7,7 +7,7 @@ class TextConfig implements Config {
 
   const TextConfig({
     this.fontFamilyName = "Lemonada",
-    this.textColorHex = "1F1F1F",
+    this.textColorHex = "FF1F1F1F",
     this.captureText = "Smile",
   });
 
