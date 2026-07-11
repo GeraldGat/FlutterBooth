@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutterbooth/exceptions/gphoto2_exception.dart';
+import 'package:flutterbooth/services/logger/app_logger.dart';
 import 'package:uuid/uuid.dart';
 
 class CaptureService {
@@ -29,9 +30,10 @@ class CaptureService {
       }
 
       return fullPath;
-    } catch (e) {
+    } catch (e, s) {
         if(e is GPhoto2Exception) rethrow;
 
+        AppLogger.e('Unexpected error while running gphoto2', e, s);
         throw GPhoto2Exception("Unexpected error while running gphoto2", gphotoOptions);
     }
   }

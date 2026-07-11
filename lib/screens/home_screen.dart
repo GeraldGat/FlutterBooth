@@ -15,8 +15,9 @@ import 'package:flutterbooth/screens/collage_screen.dart';
 import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
 import 'package:flutterbooth/screens/gallery_screen.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
+import 'package:flutterbooth/providers/capture_service_provider.dart';
 import 'package:flutterbooth/screens/settings_screen.dart';
-import 'package:flutterbooth/services/capture_service.dart';
+import 'package:flutterbooth/services/logger/app_logger.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:flutterbooth/widgets/rotating_menu.dart';
 
@@ -105,7 +106,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   items: [
                     RotatingMenuItem(
                       onPressed: () async {
-                        final captureService = CaptureService(config.settings.fileSavePath, config.settings.gphotoPort);
+                        final captureService = ref.read(captureServiceProvider(tempFolderPath: config.settings.fileSavePath, gphotoPort: config.settings.gphotoPort));
                         if (!context.mounted) return;
                         Navigator.push(
                           context,
@@ -139,7 +140,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                       ),
                                     ),
                                   );
-                                } on GPhoto2Exception {
+                                } on GPhoto2Exception catch (e) {
+                                  AppLogger.e('GPhoto2 capture failed', e);
                                   if(!context.mounted) return;
 
                                   showCaptureError(context);

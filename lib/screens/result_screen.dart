@@ -5,7 +5,7 @@ import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.da
 import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'package:flutterbooth/models/print_result.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
-import 'package:flutterbooth/services/print_service.dart';
+import 'package:flutterbooth/providers/print_service_provider.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:flutterbooth/widgets/rotating_menu.dart';
 
@@ -95,7 +95,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                         onPressed: () async {
                           if (widget.image.image is FileImage) {
                             final file = (widget.image.image as FileImage).file;
-                            PrintService service = PrintService();
+                            final service = ref.read(printServiceProvider);
                             PrintResult printResult = await service.printFile(file);
                             if (context.mounted) {
                               if (printResult.success) {

@@ -7,6 +7,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutterbooth/models/print_options.dart';
 import 'package:flutterbooth/models/print_result.dart';
+import 'package:flutterbooth/services/logger/app_logger.dart';
 
 class PrintServiceException implements Exception {
   final String message;
@@ -25,8 +26,10 @@ class PrintService {
       final pdfBytes = await _buildPdf(imageBytes, options);
       return await _sendToPrinter(pdfBytes, options);
     } on PrintServiceException catch (e) {
+      AppLogger.e('Print failed with PrintServiceException', e);
       return PrintResult.failure(e.message);
-    } catch (e) {
+    } catch (e, s) {
+      AppLogger.e('Unexpected error during print', e, s);
       return PrintResult.failure('Unexpected error : $e');
     }
   }
@@ -38,7 +41,8 @@ class PrintService {
     try {
       final data = await rootBundle.load(assetPath);
       return printImageBytes(data.buffer.asUint8List(), options: options);
-    } catch (e) {
+    } catch (e, s) {
+      AppLogger.e("Failed to load asset \"$assetPath\"", e, s);
       return PrintResult.failure(
         "Can't load asset \"$assetPath\" : $e",
       );
@@ -58,7 +62,8 @@ class PrintService {
     final int fileSize;
     try {
       fileSize = await file.length();
-    } catch (e) {
+    } catch (e, s) {
+      AppLogger.e('Failed to get file length', e, s);
       return PrintResult.failure(
         'Can\'t read file "${file.path}" : $e',
       );
@@ -72,10 +77,12 @@ class PrintService {
       final imageBytes = await file.readAsBytes();
       return printImageBytes(imageBytes, options: options);
     } on FileSystemException catch (e) {
+      AppLogger.e('File system error reading "${file.path}"', e);
       return PrintResult.failure(
         'System error when reading "${file.path}" : ${e.message}',
       );
-    } catch (e) {
+    } catch (e, s) {
+      AppLogger.e('Unexpected error reading file', e, s);
       return PrintResult.failure(
         'Unexpected error when reading : $e',
       );

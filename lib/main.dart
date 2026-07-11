@@ -1,15 +1,44 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterbooth/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
+import 'package:flutterbooth/services/logger/app_logger.dart';
+import 'package:flutterbooth/services/logger/console_log_output.dart';
+import 'package:flutterbooth/services/logger/file_log_output.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_listener.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:window_manager/window_manager.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final appDir = await getApplicationSupportDirectory();
+  await AppLogger.init(
+    outputs: [
+      FileLogOutput(logDirectory: '${appDir.path}/logs'),
+      ConsoleLogOutput(),
+    ],
+  );
+
+  FlutterError.onError = (details) {
+    AppLogger.e(
+      '${details.exception.runtimeType}: ${details.exception}',
+      details.exception,
+      details.stack,
+    );
+    FlutterError.presentError(details);
+  };
+
+  ui.PlatformDispatcher.instance.onError = (error, stack) {
+    AppLogger.e('${error.runtimeType}: $error', error, stack);
+    return true;
+  };
+
   await windowManager.ensureInitialized();
 
   final startFullscreen = Platform.environment.containsKey('FULLSCREEN');
@@ -25,7 +54,12 @@ void main() async {
     },
   );
 
-  runApp(const ProviderScope(child: App()));
+  runZonedGuarded(
+    () => runApp(const ProviderScope(child: App())),
+    (error, stack) {
+      AppLogger.e('${error.runtimeType}: $error', error, stack);
+    },
+  );
 }
 
 class App extends ConsumerWidget {
