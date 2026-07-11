@@ -15,7 +15,6 @@ class ConfigNotifier extends _$ConfigNotifier {
   FutureOr<AppConfig> build() async {
     ConfigService configService = ref.read(configServiceProvider);
     final config = await configService.getConfig();
-    state = AsyncData(config);
     return config;
   }
 
