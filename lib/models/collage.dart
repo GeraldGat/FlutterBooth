@@ -89,7 +89,7 @@ Future<String> buildCollageInIsolate({
       );
     }
 
-    File(outputPath).writeAsBytesSync(img.encodeJpg(collage, quality: 100));
+    File(outputPath).writeAsBytesSync(img.encodeJpg(collage, quality: 95));
     return outputPath;
   });
 }
