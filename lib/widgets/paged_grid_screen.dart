@@ -6,6 +6,13 @@ import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.da
 import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 
+class _ActionItem {
+  final bool isEnabled;
+  final VoidCallback callback;
+
+  const _ActionItem({required this.isEnabled, required this.callback});
+}
+
 class PagedGridScreen extends ConsumerStatefulWidget {
   final int totalItemCount;
   final Widget Function(AppConfig config, int index) itemContentBuilder;
@@ -36,16 +43,16 @@ class _PagedGridScreenState extends ConsumerState<PagedGridScreen> {
     return end - start;
   }
 
-  List<(bool, Function)> get actionList {
+  List<_ActionItem> get actionList {
     final count = pageItemCount;
     return [
-      (currentPage > 0, _previousPage),
-      (count > 0, _performSelectedAction),
-      (count > 1, _performSelectedAction),
-      (count > 2, _performSelectedAction),
-      (count > 3, _performSelectedAction),
-      ((currentPage + 1) * 4 < widget.totalItemCount, _nextPage),
-      (true, _closeScreen),
+      _ActionItem(isEnabled: currentPage > 0, callback: _previousPage),
+      _ActionItem(isEnabled: count > 0, callback: _performSelectedAction),
+      _ActionItem(isEnabled: count > 1, callback: _performSelectedAction),
+      _ActionItem(isEnabled: count > 2, callback: _performSelectedAction),
+      _ActionItem(isEnabled: count > 3, callback: _performSelectedAction),
+      _ActionItem(isEnabled: (currentPage + 1) * 4 < widget.totalItemCount, callback: _nextPage),
+      _ActionItem(isEnabled: true, callback: _closeScreen),
     ];
   }
 
@@ -71,7 +78,7 @@ class _PagedGridScreenState extends ConsumerState<PagedGridScreen> {
 
     for (int i = 0; i < actionList.length; i++) {
       nextIndex = (nextIndex + step + actionList.length) % actionList.length;
-      if (actionList[nextIndex].$1 == true) {
+      if (actionList[nextIndex].isEnabled) {
         return nextIndex;
       }
     }
@@ -88,8 +95,9 @@ class _PagedGridScreenState extends ConsumerState<PagedGridScreen> {
   }
 
   void _handleEnter() {
-    if (actionList[selectedIndex].$1 == true) {
-      actionList[selectedIndex].$2.call();
+    final action = actionList[selectedIndex];
+    if (action.isEnabled) {
+      action.callback();
     }
   }
 
@@ -145,7 +153,7 @@ class _PagedGridScreenState extends ConsumerState<PagedGridScreen> {
             children: [
               widget.backgroundBuilder(config),
 
-              if (actionList[0].$1 == true)
+              if (actionList[0].isEnabled)
                 Positioned(
                   left: 0,
                   top: 0,
@@ -204,7 +212,7 @@ class _PagedGridScreenState extends ConsumerState<PagedGridScreen> {
                 ),
               ),
 
-              if (actionList[5].$1 == true)
+              if (actionList[5].isEnabled)
                 Positioned(
                   right: 0,
                   top: 0,
