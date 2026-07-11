@@ -44,12 +44,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _openSettings() async {
-    final accessCheckerService = ref.read(accessCheckerProvider);
+    final configAsync = ref.read(configProvider);
+    if (!configAsync.hasValue || configAsync.value == null) return;
 
-    final allowed = await accessCheckerService.checkAdminAccess(context);
+    final accessCheckerService = ref.read(accessCheckerProvider);
+    final allowed = await accessCheckerService.checkAdminAccess(context, configAsync.value!);
     if (!allowed) return;
     if (!mounted) return;
-    
+
     await Navigator.push(
       context,
       MaterialPageRoute(
