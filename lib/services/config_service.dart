@@ -11,7 +11,7 @@ class ConfigService {
     return File("${dir.path}/$_fileName");
   }
 
-  Future<AppConfig> loadConfig() async {
+  Future<AppConfig> getConfig() async {
     final file = await _getConfigFile();
 
     if (!await file.exists()) return AppConfig();
@@ -20,10 +20,6 @@ class ConfigService {
     final data = jsonDecode(content);
 
     return AppConfig.fromJson(data);
-  }
-
-  Future<AppConfig> getConfig() async {
-    return await loadConfig();
   }
 
   Future<void> saveConfig(AppConfig config) async {
