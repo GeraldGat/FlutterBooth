@@ -10,6 +10,7 @@ import 'package:flutterbooth/providers/config_provider.dart';
 import 'package:flutterbooth/screens/countdown_and_capture_screen.dart';
 import 'package:flutterbooth/screens/result_screen.dart';
 import 'package:flutterbooth/providers/capture_service_provider.dart';
+import 'package:flutterbooth/screens/home_screen.dart';
 import 'package:flutterbooth/services/logger/app_logger.dart';
 import 'package:flutterbooth/widgets/paged_grid_screen.dart';
 import 'package:path_provider/path_provider.dart';
@@ -32,7 +33,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
 
     for (int i = 0; i < collage.imageCount; i++) {
       if (mounted) {
-        dynamic captureReturn = await Navigator.push(
+        final captureReturn = await Navigator.push<Object?>(
           context,
           MaterialPageRoute(
             builder: (_) => CountdownAndCaptureScreen(
@@ -61,9 +62,10 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
             );
             Navigator.pop(context);
           }
+          return;
         }
 
-        capturedImages.add(captureReturn);
+        capturedImages.add(captureReturn as String);
       }
     }
 
@@ -96,6 +98,17 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
         SnackBar(
           content: Text(e.message),
         ),
+      );
+    } catch (e, s) {
+      AppLogger.e('Unexpected error during collage build', e, s);
+      if(!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("An unexpected error occurred.")),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     }
   }
