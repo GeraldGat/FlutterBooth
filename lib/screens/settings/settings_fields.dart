@@ -62,11 +62,24 @@ Widget buildFontFamilyField(
 ) {
   return Container(
     margin: const EdgeInsets.only(bottom: 8),
-    child: DropdownButtonFormField<String>(
-      initialValue: value,
-      decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
-      items: fonts.map((f) => DropdownMenuItem(value: f, child: Text(f))).toList(),
-      onChanged: (val) => onChanged(val ?? value),
+    child: Autocomplete<String>(
+      initialValue: TextEditingValue(text: value),
+      optionsBuilder: (textEditingValue) {
+        if (textEditingValue.text.isEmpty) {
+          return fonts.take(50);
+        }
+        return fonts.where((font) =>
+          font.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+      },
+      onSelected: (selection) => onChanged(selection),
+      fieldViewBuilder: (context, textEditingController, focusNode, onSubmitted) {
+        return TextFormField(
+          controller: textEditingController,
+          focusNode: focusNode,
+          decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
+          onFieldSubmitted: (_) => onSubmitted(),
+        );
+      },
     ),
   );
 }

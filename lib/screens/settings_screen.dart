@@ -25,6 +25,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _passwordController = TextEditingController();
   bool _passwordEverModified = false;
   AppConfig? _config;
+  List<String>? _cachedFonts;
 
   @override
   void dispose() {
@@ -86,7 +87,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           }
         }
         final tabs = ["Settings", "Wallpapers", "Icons", "Texts", "Shortcuts"];
-        final fonts = GoogleFonts.asMap().keys.toList()..sort();
+        final fonts = _cachedFonts ??= GoogleFonts.asMap().keys.toList()..sort();
 
         return DefaultTabController(
           length: tabs.length,
