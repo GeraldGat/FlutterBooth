@@ -38,6 +38,26 @@ class TextsTab extends StatelessWidget {
           config.texts.captureText,
           (v) => onChanged(config.copyWith(texts: config.texts.copyWith(captureText: v))),
         ),
+        buildTextField(
+          "Countdown font size",
+          config.texts.countdownFontSize.toInt().toString(),
+          (v) {
+            final size = double.tryParse(v);
+            if (size != null) {
+              onChanged(config.copyWith(texts: config.texts.copyWith(countdownFontSize: size)));
+            }
+          },
+        ),
+        buildTextField(
+          "Home screen font size",
+          config.texts.homeFontSize.toInt().toString(),
+          (v) {
+            final size = double.tryParse(v);
+            if (size != null) {
+              onChanged(config.copyWith(texts: config.texts.copyWith(homeFontSize: size)));
+            }
+          },
+        ),
       ],
     );
   }

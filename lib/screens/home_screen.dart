@@ -20,6 +20,7 @@ import 'package:flutterbooth/screens/settings_screen.dart';
 import 'package:flutterbooth/services/logger/app_logger.dart';
 import 'package:flutterbooth/widgets/fb_keyboard_actions.dart';
 import 'package:flutterbooth/widgets/rotating_menu.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -89,8 +90,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   Text(
                     config.settings.homeText,
-                    style: TextStyle(
-                      fontSize: 40,
+                    style: GoogleFonts.getFont(
+                      config.texts.fontFamilyName,
+                      fontSize: config.texts.homeFontSize,
                       color: config.textColor,
                     ),
                     textAlign: TextAlign.center,

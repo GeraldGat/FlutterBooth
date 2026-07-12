@@ -152,17 +152,28 @@ void main() {
     test('defaults are correct', () {
       const config = TextConfig();
       expect(config.fontFamilyName, 'Lemonada');
-      expect(config.textColorHex, '1F1F1F');
+      expect(config.textColorHex, 'FF1F1F1F');
       expect(config.captureText, 'Smile');
+      expect(config.countdownFontSize, 100);
+      expect(config.homeFontSize, 40);
     });
 
     test('fromJson and toJson roundtrip', () {
-      final config = TextConfig.fromJson({'fontFamilyName': 'Roboto', 'captureText': 'Cheese'});
+      final config = TextConfig.fromJson({
+        'fontFamilyName': 'Roboto',
+        'captureText': 'Cheese',
+        'countdownFontSize': 120,
+        'homeFontSize': 48,
+      });
       expect(config.fontFamilyName, 'Roboto');
       expect(config.captureText, 'Cheese');
+      expect(config.countdownFontSize, 120);
+      expect(config.homeFontSize, 48);
       final json = config.toJson();
       expect(json['fontFamilyName'], 'Roboto');
       expect(json['captureText'], 'Cheese');
+      expect(json['countdownFontSize'], 120);
+      expect(json['homeFontSize'], 48);
     });
   });
 

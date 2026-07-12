@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CountdownAndCaptureScreen extends ConsumerStatefulWidget {
   final void Function()? onCapture;
@@ -72,9 +73,9 @@ class _CountdownAndCaptureScreenState extends ConsumerState<CountdownAndCaptureS
               Center(
                 child: Text(
                   text,
-                  style: TextStyle(
-                    fontFamily: config.texts.fontFamilyName,
-                    fontSize: 100,
+                  style: GoogleFonts.getFont(
+                    config.texts.fontFamilyName,
+                    fontSize: config.texts.countdownFontSize,
                     fontWeight: FontWeight.bold,
                     color: config.textColor,
                   ),
