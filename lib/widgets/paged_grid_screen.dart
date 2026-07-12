@@ -111,18 +111,8 @@ class _PagedGridScreenState extends ConsumerState<PagedGridScreen> {
   void didUpdateWidget(PagedGridScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.totalItemCount != oldWidget.totalItemCount) {
-      if (pageItemCount == 0 && currentPage > 0) {
-        currentPage--;
-        selectedIndex = 1;
-      }
-      if (widget.totalItemCount == 0) {
-        selectedIndex = 6;
-      } else if (oldWidget.totalItemCount == 0 && selectedIndex == 6) {
-        selectedIndex = 1;
-      }
-      if (selectedIndex >= 1 && selectedIndex <= 4 && selectedIndex > pageItemCount) {
-        selectedIndex = pageItemCount > 0 ? pageItemCount : 6;
-      }
+      currentPage = 0;
+      selectedIndex = 1;
     }
   }
 
