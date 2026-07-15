@@ -84,9 +84,94 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  config.eventLogo(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    fit: BoxFit.contain,
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                            _MenuDescription(
+                              icon: config.photoIcon(
+                                width: 32,
+                                height: 32,
+                                colorFilter: ColorFilter.mode(
+                                  config.mainColor,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              text: "Take a photo",
+                              textStyle: GoogleFonts.getFont(
+                                config.texts.fontFamilyName,
+                                fontSize: config.texts.homeFontSize * 0.6,
+                                color: config.textColor,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            _MenuDescription(
+                              icon: config.galleryIcon(
+                                width: 32,
+                                height: 32,
+                                colorFilter: ColorFilter.mode(
+                                  config.mainColor,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              text: "View gallery",
+                              textStyle: GoogleFonts.getFont(
+                                config.texts.fontFamilyName,
+                                fontSize: config.texts.homeFontSize * 0.6,
+                                color: config.textColor,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            _MenuDescription(
+                              icon: config.collageIcon(
+                                width: 32,
+                                height: 32,
+                                colorFilter: ColorFilter.mode(
+                                  config.mainColor,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              text: "Create collage",
+                              textStyle: GoogleFonts.getFont(
+                                config.texts.fontFamilyName,
+                                fontSize: config.texts.homeFontSize * 0.6,
+                                color: config.textColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                        flex: 3,
+                        child: Center(
+                          child: config.eventLogo(
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Center(
+                          child: Text(
+                            config.settings.homeRightText,
+                            style: GoogleFonts.getFont(
+                              config.texts.fontFamilyName,
+                              fontSize: config.texts.homeFontSize,
+                              color: config.textColor,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   Text(
                     config.settings.homeText,
@@ -225,6 +310,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       error: (error, stack) => Scaffold(
         body: Center(child: Text('Error loading config: $error')),
       ),
+    );
+  }
+}
+
+class _MenuDescription extends StatelessWidget {
+  final Widget icon;
+  final String text;
+  final TextStyle textStyle;
+
+  const _MenuDescription({
+    required this.icon,
+    required this.text,
+    required this.textStyle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        icon,
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            text,
+            style: textStyle,
+          ),
+        ),
+      ],
     );
   }
 }

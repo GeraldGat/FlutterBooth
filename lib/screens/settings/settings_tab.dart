@@ -41,6 +41,11 @@ class SettingsTab extends StatelessWidget {
           config.settings.homeText,
           (v) => onChanged(config.copyWith(settings: config.settings.copyWith(homeText: v))),
         ),
+        buildTextField(
+          "Home right text",
+          config.settings.homeRightText,
+          (v) => onChanged(config.copyWith(settings: config.settings.copyWith(homeRightText: v))),
+        ),
         buildColorField(
           context,
           "Main color",
