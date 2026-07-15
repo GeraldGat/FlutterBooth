@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterbooth/exceptions/gphoto2_exception.dart';
+import 'package:flutterbooth/l10n/app_localizations.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
@@ -103,7 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   BlendMode.srcIn,
                                 ),
                               ),
-                              text: "Take a photo",
+                              text: AppLocalizations.of(context)!.homeMenuPhoto,
                               textStyle: GoogleFonts.getFont(
                                 config.texts.fontFamilyName,
                                 fontSize: config.texts.homeFontSize * 0.6,
@@ -120,7 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   BlendMode.srcIn,
                                 ),
                               ),
-                              text: "View gallery",
+                              text: AppLocalizations.of(context)!.homeMenuGallery,
                               textStyle: GoogleFonts.getFont(
                                 config.texts.fontFamilyName,
                                 fontSize: config.texts.homeFontSize * 0.6,
@@ -137,7 +138,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   BlendMode.srcIn,
                                 ),
                               ),
-                              text: "Create collage",
+                              text: AppLocalizations.of(context)!.homeMenuCollage,
                               textStyle: GoogleFonts.getFont(
                                 config.texts.fontFamilyName,
                                 fontSize: config.texts.homeFontSize * 0.6,
@@ -204,7 +205,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               onCapture: () async {
                                 void showCaptureError(BuildContext context) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("An error occured while capturing image.")),
+                                    SnackBar(content: Text(AppLocalizations.of(context)!.captureError)),
                                   );
                                   Navigator.pop(context);
                                 }

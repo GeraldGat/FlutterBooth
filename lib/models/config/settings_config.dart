@@ -10,6 +10,7 @@ class SettingsConfig implements Config {
   final String? adminPassword;
   final String? passwordSalt;
   final String? gphotoPort;
+  final String locale;
 
   const SettingsConfig({
     this.fileSavePath = "saved/",
@@ -21,6 +22,7 @@ class SettingsConfig implements Config {
     this.adminPassword,
     this.passwordSalt,
     this.gphotoPort,
+    this.locale = "en",
   });
 
   @override
@@ -34,6 +36,7 @@ class SettingsConfig implements Config {
     String? adminPassword,
     String? passwordSalt,
     String? gphotoPort,
+    String? locale,
   }) {
     return SettingsConfig(
       fileSavePath: fileSavePath ?? this.fileSavePath,
@@ -45,6 +48,7 @@ class SettingsConfig implements Config {
       adminPassword: adminPassword ?? this.adminPassword,
       passwordSalt: passwordSalt ?? this.passwordSalt,
       gphotoPort: gphotoPort ?? this.gphotoPort,
+      locale: locale ?? this.locale,
     );
   }
 
@@ -58,6 +62,7 @@ class SettingsConfig implements Config {
     adminPassword: json["adminPassword"],
     passwordSalt: json["passwordSalt"],
     gphotoPort: json["gphotoPort"],
+    locale: json["locale"] ?? "en",
   );
 
   @override
@@ -71,5 +76,6 @@ class SettingsConfig implements Config {
     "adminPassword": adminPassword,
     "passwordSalt": passwordSalt,
     "gphotoPort": gphotoPort,
+    "locale": locale,
   };
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutterbooth/l10n/app_localizations.dart';
 
 Future<void> pickFile(void Function(String) onSelected, {List<String>? allowedExtensions}) async {
   final result = await FilePicker.platform.pickFiles(
@@ -33,20 +34,22 @@ Widget buildTextField(String label, String value, ValueChanged<String> onChanged
 }
 
 Widget buildPasswordField({
+  required BuildContext context,
   required TextEditingController controller,
   required bool hasPassword,
   required VoidCallback onModified,
 }) {
+  final l10n = AppLocalizations.of(context)!;
   return Container(
     margin: const EdgeInsets.only(bottom: 8),
     child: TextFormField(
       controller: controller,
       obscureText: true,
       decoration: InputDecoration(
-        labelText: "Admin panel password",
+        labelText: l10n.adminPassword,
         border: const OutlineInputBorder(),
         helperText: hasPassword
-            ? "Clear the field and save to remove the password"
+            ? l10n.adminPasswordHelper
             : null,
       ),
       onChanged: (_) => onModified(),
@@ -132,7 +135,7 @@ Widget buildColorField(
             final picked = await showDialog<Color>(
               context: context,
               builder: (_) => AlertDialog(
-                title: Text("Pick a color for $label"),
+                title: Text(AppLocalizations.of(context)!.pickColorTitle(label)),
                 content: SingleChildScrollView(
                   child: ColorPicker(
                     pickerColor: color,
@@ -140,8 +143,8 @@ Widget buildColorField(
                   ),
                 ),
                 actions: [
-                  TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-                  TextButton(onPressed: () => Navigator.pop(context, pickedColor), child: const Text("Select")),
+                  TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context)!.cancel)),
+                  TextButton(onPressed: () => Navigator.pop(context, pickedColor), child: Text(AppLocalizations.of(context)!.select)),
                 ],
               ),
             );

@@ -10,6 +10,7 @@ import 'settings/icons_tab.dart';
 import 'settings/settings_tab.dart';
 import 'settings/shortcuts_tab.dart';
 import 'settings/texts_tab.dart';
+import 'package:flutterbooth/l10n/app_localizations.dart';
 import 'settings/wallpapers_tab.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -86,7 +87,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             _passwordController.text = "p";
           }
         }
-        final tabs = ["Settings", "Wallpapers", "Icons", "Texts", "Shortcuts"];
+        final l10n = AppLocalizations.of(context)!;
+        final tabs = [l10n.settingsTabSettings, l10n.settingsTabWallpapers, l10n.settingsTabIcons, l10n.settingsTabTexts, l10n.settingsTabShortcuts];
         final fonts = _cachedFonts ??= GoogleFonts.asMap().keys.toList()..sort();
 
         return DefaultTabController(
@@ -94,7 +96,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           initialIndex: _currentIndex,
           child: Scaffold(
             appBar: AppBar(
-              title: const Text("Configuration"),
+              title: Text(AppLocalizations.of(context)!.settingsTitle),
               bottom: TabBar(
                 labelColor: Colors.black,
                 tabs: [for (final t in tabs) Tab(text: t)],

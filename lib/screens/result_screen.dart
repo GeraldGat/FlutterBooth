@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterbooth/l10n/app_localizations.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_icon_widgets.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
@@ -100,11 +101,11 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                             if (context.mounted) {
                               if (printResult.success) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Printing...")),
+                                  SnackBar(content: Text(AppLocalizations.of(context)!.printing)),
                                 );
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("An error occured during printing.")),
+                                  SnackBar(content: Text(AppLocalizations.of(context)!.printError)),
                                 );
                               }
                             }

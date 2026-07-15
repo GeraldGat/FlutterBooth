@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutterbooth/l10n/app_localizations.dart';
 import 'package:flutterbooth/models/config/app_config.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
 import 'package:flutterbooth/screens/settings/settings_fields.dart';
@@ -21,25 +22,25 @@ class TextsTab extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       children: [
         buildFontFamilyField(
-          "Font family",
+          AppLocalizations.of(context)!.fontFamily,
           config.texts.fontFamilyName,
           (v) => onChanged(config.copyWith(texts: config.texts.copyWith(fontFamilyName: v))),
           fonts,
         ),
         buildColorField(
           context,
-          "Text color",
+          AppLocalizations.of(context)!.textColor,
           config.textColor,
           config.texts.textColorHex,
           (v) => onChanged(config.copyWith(texts: config.texts.copyWith(textColorHex: v))),
         ),
         buildTextField(
-          "Capture text",
+          AppLocalizations.of(context)!.captureTextLabel,
           config.texts.captureText,
           (v) => onChanged(config.copyWith(texts: config.texts.copyWith(captureText: v))),
         ),
         buildTextField(
-          "Countdown font size",
+          AppLocalizations.of(context)!.countdownFontSize,
           config.texts.countdownFontSize.toInt().toString(),
           (v) {
             final size = double.tryParse(v);
@@ -49,7 +50,7 @@ class TextsTab extends StatelessWidget {
           },
         ),
         buildTextField(
-          "Home screen font size",
+          AppLocalizations.of(context)!.homeScreenFontSize,
           config.texts.homeFontSize.toInt().toString(),
           (v) {
             final size = double.tryParse(v);

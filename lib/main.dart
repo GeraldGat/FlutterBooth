@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutterbooth/l10n/app_localizations.dart';
 import 'package:flutterbooth/screens/home_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
@@ -69,8 +70,15 @@ class App extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncConfig = ref.watch(configProvider);
 
+    final locale = asyncConfig.whenOrNull(
+          data: (config) => Locale(config.settings.locale),
+        ) ?? const Locale('en');
+
     return MaterialApp(
       title: 'Flutterbooth',
+      locale: locale,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       builder: (context, child) {
         return asyncConfig.when(
           data: (config) => FbKeyboardListener(

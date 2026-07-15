@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutterbooth/l10n/app_localizations.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_colors.dart';
 import 'package:flutterbooth/models/config/extensions/app_config_image_widgets.dart';
 import 'package:flutterbooth/providers/config_provider.dart';
@@ -50,15 +51,15 @@ class _CountdownAndCaptureScreenState extends ConsumerState<CountdownAndCaptureS
         switch (_counter) {
           case 3:
             background = config.countdown3();
-            text = "3";
+            text = AppLocalizations.of(context)!.countdownNum3;
             break;
           case 2:
             background = config.countdown2();
-            text = "2";
+            text = AppLocalizations.of(context)!.countdownNum2;
             break;
           case 1:
             background = config.countdown1();
-            text = "1";
+            text = AppLocalizations.of(context)!.countdownNum1;
             break;
           default:
             background = config.capture();

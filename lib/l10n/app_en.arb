@@ -1,0 +1,298 @@
+{
+  "@@locale": "en",
+
+  "homeMenuPhoto": "Take a photo",
+  "@homeMenuPhoto": {
+    "description": "Label for the photo capture menu item on home screen"
+  },
+
+  "homeMenuGallery": "View gallery",
+  "@homeMenuGallery": {
+    "description": "Label for the gallery menu item on home screen"
+  },
+
+  "homeMenuCollage": "Create collage",
+  "@homeMenuCollage": {
+    "description": "Label for the collage menu item on home screen"
+  },
+
+  "captureError": "An error occured while capturing image.",
+  "@captureError": {
+    "description": "Snackbar message when image capture fails"
+  },
+
+  "printing": "Printing...",
+  "@printing": {
+    "description": "Snackbar message when printing is in progress"
+  },
+
+  "printError": "An error occured during printing.",
+  "@printError": {
+    "description": "Snackbar message when printing fails"
+  },
+
+  "unexpectedError": "An unexpected error occurred.",
+  "@unexpectedError": {
+    "description": "Snackbar message for unexpected errors"
+  },
+
+  "settingsTitle": "Configuration",
+  "@settingsTitle": {
+    "description": "Title of the settings screen"
+  },
+
+  "settingsTabSettings": "Settings",
+  "@settingsTabSettings": {
+    "description": "Label for the Settings tab in settings screen"
+  },
+
+  "settingsTabWallpapers": "Wallpapers",
+  "@settingsTabWallpapers": {
+    "description": "Label for the Wallpapers tab in settings screen"
+  },
+
+  "settingsTabIcons": "Icons",
+  "@settingsTabIcons": {
+    "description": "Label for the Icons tab in settings screen"
+  },
+
+  "settingsTabTexts": "Texts",
+  "@settingsTabTexts": {
+    "description": "Label for the Texts tab in settings screen"
+  },
+
+  "settingsTabShortcuts": "Shortcuts",
+  "@settingsTabShortcuts": {
+    "description": "Label for the Shortcuts tab in settings screen"
+  },
+
+  "adminPassword": "Admin panel password",
+  "@adminPassword": {
+    "description": "Label for the admin password field in settings"
+  },
+
+  "adminPasswordHelper": "Clear the field and save to remove the password",
+  "@adminPasswordHelper": {
+    "description": "Helper text below admin password field"
+  },
+
+  "pickColorTitle": "Pick a color for {label}",
+  "@pickColorTitle": {
+    "description": "Title of the color picker dialog",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button label"
+  },
+
+  "select": "Select",
+  "@select": {
+    "description": "Select button label in color picker"
+  },
+
+  "fileSavePath": "File save path",
+  "@fileSavePath": {
+    "description": "Label for file save path field in settings"
+  },
+
+  "eventLogo": "Event Logo",
+  "@eventLogo": {
+    "description": "Label for event logo field in settings"
+  },
+
+  "homeText": "Home text",
+  "@homeText": {
+    "description": "Label for home text field in settings"
+  },
+
+  "homeRightText": "Home right text",
+  "@homeRightText": {
+    "description": "Label for home right text field in settings"
+  },
+
+  "mainColor": "Main color",
+  "@mainColor": {
+    "description": "Label for main color field in settings"
+  },
+
+  "accentColor": "Accent color",
+  "@accentColor": {
+    "description": "Label for accent color field in settings"
+  },
+
+  "gphotoPort": "Gphoto2 port",
+  "@gphotoPort": {
+    "description": "Label for Gphoto2 port field in settings"
+  },
+
+  "fontFamily": "Font family",
+  "@fontFamily": {
+    "description": "Label for font family field in settings"
+  },
+
+  "textColor": "Text color",
+  "@textColor": {
+    "description": "Label for text color field in settings"
+  },
+
+  "captureTextLabel": "Capture text",
+  "@captureTextLabel": {
+    "description": "Label for capture text field in settings"
+  },
+
+  "countdownFontSize": "Countdown font size",
+  "@countdownFontSize": {
+    "description": "Label for countdown font size field in settings"
+  },
+
+  "homeScreenFontSize": "Home screen font size",
+  "@homeScreenFontSize": {
+    "description": "Label for home screen font size field in settings"
+  },
+
+  "mainWallpaper": "Main wallpaper",
+  "@mainWallpaper": {
+    "description": "Label for main wallpaper field in settings"
+  },
+
+  "countdown3": "Countdown 3",
+  "@countdown3": {
+    "description": "Label for countdown 3 wallpaper field in settings"
+  },
+
+  "countdown2": "Countdown 2",
+  "@countdown2": {
+    "description": "Label for countdown 2 wallpaper field in settings"
+  },
+
+  "countdown1": "Countdown 1",
+  "@countdown1": {
+    "description": "Label for countdown 1 wallpaper field in settings"
+  },
+
+  "captureWallpaper": "Capture",
+  "@captureWallpaper": {
+    "description": "Label for capture wallpaper field in settings"
+  },
+
+  "resultWallpaper": "Result",
+  "@resultWallpaper": {
+    "description": "Label for result wallpaper field in settings"
+  },
+
+  "galleryWallpaper": "Gallery",
+  "@galleryWallpaper": {
+    "description": "Label for gallery wallpaper field in settings"
+  },
+
+  "collageWallpaper": "Collage",
+  "@collageWallpaper": {
+    "description": "Label for collage wallpaper field in settings"
+  },
+
+  "iconPhoto": "Photo",
+  "@iconPhoto": {
+    "description": "Label for photo icon field in settings"
+  },
+
+  "iconGallery": "Gallery",
+  "@iconGallery": {
+    "description": "Label for gallery icon field in settings"
+  },
+
+  "iconCollage": "Collage",
+  "@iconCollage": {
+    "description": "Label for collage icon field in settings"
+  },
+
+  "iconBack": "Back",
+  "@iconBack": {
+    "description": "Label for back icon field in settings"
+  },
+
+  "iconPrint": "Print",
+  "@iconPrint": {
+    "description": "Label for print icon field in settings"
+  },
+
+  "iconRemove": "Remove",
+  "@iconRemove": {
+    "description": "Label for remove icon field in settings"
+  },
+
+  "iconClose": "Close",
+  "@iconClose": {
+    "description": "Label for close icon field in settings"
+  },
+
+  "iconPrevious": "Previous",
+  "@iconPrevious": {
+    "description": "Label for previous icon field in settings"
+  },
+
+  "iconNext": "Next",
+  "@iconNext": {
+    "description": "Label for next icon field in settings"
+  },
+
+  "shortcutOpenSettings": "Open Settings",
+  "@shortcutOpenSettings": {
+    "description": "Label for open settings shortcut field"
+  },
+
+  "shortcutPrevious": "Previous",
+  "@shortcutPrevious": {
+    "description": "Label for previous shortcut field"
+  },
+
+  "shortcutNext": "Next",
+  "@shortcutNext": {
+    "description": "Label for next shortcut field"
+  },
+
+  "shortcutEnter": "Enter",
+  "@shortcutEnter": {
+    "description": "Label for enter shortcut field"
+  },
+
+  "passwordRequired": "Password required",
+  "@passwordRequired": {
+    "description": "Title of the admin password dialog"
+  },
+
+  "adminPasswordField": "Admin password",
+  "@adminPasswordField": {
+    "description": "Label for password field in access dialog"
+  },
+
+  "ok": "OK",
+  "@ok": {
+    "description": "Confirm button label in password dialog"
+  },
+
+  "countdownNum3": "3",
+  "@countdownNum3": {
+    "description": "Countdown number 3"
+  },
+
+  "countdownNum2": "2",
+  "@countdownNum2": {
+    "description": "Countdown number 2"
+  },
+
+  "countdownNum1": "1",
+  "@countdownNum1": {
+    "description": "Countdown number 1"
+  },
+
+  "language": "Language",
+  "@language": {
+    "description": "Label for the language dropdown in settings"
+  }
+}

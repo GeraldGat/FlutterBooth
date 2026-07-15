@@ -1,0 +1,72 @@
+{
+  "@@locale": "fr",
+
+  "homeMenuPhoto": "Prendre une photo",
+  "homeMenuGallery": "Voir la galerie",
+  "homeMenuCollage": "Créer un collage",
+  "captureError": "Une erreur est survenue lors de la capture.",
+  "printing": "Impression en cours...",
+  "printError": "Une erreur est survenue lors de l'impression.",
+  "unexpectedError": "Une erreur inattendue s'est produite.",
+
+  "settingsTitle": "Configuration",
+  "settingsTabSettings": "Paramètres",
+  "settingsTabWallpapers": "Fonds d'écran",
+  "settingsTabIcons": "Icônes",
+  "settingsTabTexts": "Textes",
+  "settingsTabShortcuts": "Raccourcis",
+
+  "adminPassword": "Mot de passe administrateur",
+  "adminPasswordHelper": "Effacez le champ et enregistrez pour supprimer le mot de passe",
+  "pickColorTitle": "Choisissez une couleur pour {label}",
+  "cancel": "Annuler",
+  "select": "Sélectionner",
+
+  "fileSavePath": "Chemin de sauvegarde",
+  "eventLogo": "Logo de l'événement",
+  "homeText": "Texte d'accueil",
+  "homeRightText": "Texte droit d'accueil",
+  "mainColor": "Couleur principale",
+  "accentColor": "Couleur d'accentuation",
+  "gphotoPort": "Port Gphoto2",
+
+  "fontFamily": "Famille de police",
+  "textColor": "Couleur du texte",
+  "captureTextLabel": "Texte de capture",
+  "countdownFontSize": "Taille du compte à rebours",
+  "homeScreenFontSize": "Taille du texte d'accueil",
+
+  "mainWallpaper": "Fond d'écran principal",
+  "countdown3": "Compte à rebours 3",
+  "countdown2": "Compte à rebours 2",
+  "countdown1": "Compte à rebours 1",
+  "captureWallpaper": "Capture",
+  "resultWallpaper": "Résultat",
+  "galleryWallpaper": "Galerie",
+  "collageWallpaper": "Collage",
+
+  "iconPhoto": "Photo",
+  "iconGallery": "Galerie",
+  "iconCollage": "Collage",
+  "iconBack": "Retour",
+  "iconPrint": "Imprimer",
+  "iconRemove": "Supprimer",
+  "iconClose": "Fermer",
+  "iconPrevious": "Précédent",
+  "iconNext": "Suivant",
+
+  "shortcutOpenSettings": "Ouvrir les paramètres",
+  "shortcutPrevious": "Précédent",
+  "shortcutNext": "Suivant",
+  "shortcutEnter": "Entrée",
+
+  "passwordRequired": "Mot de passe requis",
+  "adminPasswordField": "Mot de passe administrateur",
+  "ok": "OK",
+
+  "countdownNum3": "3",
+  "countdownNum2": "2",
+  "countdownNum1": "1",
+
+  "language": "Langue"
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterbooth/exceptions/collage_exception.dart';
 import 'package:flutterbooth/exceptions/gphoto2_exception.dart';
+import 'package:flutterbooth/l10n/app_localizations.dart';
 import 'dart:io';
 
 import 'package:flutterbooth/models/collage.dart';
@@ -58,7 +59,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
         if (captureReturn == false) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("An error occured while capturing image.")),
+              SnackBar(content: Text(AppLocalizations.of(context)!.captureError)),
             );
             Navigator.pop(context);
           }
@@ -104,7 +105,7 @@ class _CollageScreenState extends ConsumerState<CollageScreen> {
       if(!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("An unexpected error occurred.")),
+        SnackBar(content: Text(AppLocalizations.of(context)!.unexpectedError)),
       );
       Navigator.pushReplacement(
         context,
